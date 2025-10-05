@@ -74,7 +74,7 @@ div.AnimatedPanel.AnimationDelay { transition: transform 1s ease-in-out .3s; }
 .TeamBox.Lineups.UseLT .JammerBox .InBox { background-color: var(--element-inbox-bg); color: var(--element-inbox-fg); } 
 .TeamBox .JammerBox .Penalties:not(:empty) { padding-left: 5px; }
 .TeamBox.Lineups.UseLT .JammerBox .Jamming:before { content: "★"; } 
-.TeamBox.Lineups.UseLT .Lead .JammerBox .Jamming { color: #f00; animation: HasLead 2s infinite steps(12); } 
+.TeamBox.Lineups.UseLT.InJam .Lead .JammerBox .Jamming { color: #f00; animation: HasLead 2s infinite steps(12); } 
 @keyframes HasLead { 
     0% { color: #FF0000; } 50% { color: #FFFFFF; } 100% { color: #FF0000; } 
     }
