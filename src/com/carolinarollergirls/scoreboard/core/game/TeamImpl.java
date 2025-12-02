@@ -246,6 +246,7 @@ public class TeamImpl extends ScoreBoardEventProviderImpl<Team> implements Team 
                 // no team change after game start
                 return last;
             }
+            if (value != null) { execute(CLEAR_SKATERS, source); }
             set(PREPARED_TEAM_CONNECTED, value != null, source, Flag.SPECIAL_CASE);
         }
         if (prop == PREPARED_TEAM_CONNECTED && flag != Flag.SPECIAL_CASE && get(PREPARED_TEAM) == null) {
