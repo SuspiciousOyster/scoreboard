@@ -25,7 +25,7 @@
         <li><a href="#IgrfTab">IGRF</a></li>
         <li><a href="#SettingsTab">Settings</a></li>
         <li id="capsLockWarning" class="sbHide">Caps Lock Is On</li>
-        <button id="logoutButton" sbCall="Logout">Logout</button>
+        <button id="logoutButton" sbCall="Logout">Change Operator</button>
       </ul>
       <div id="ControlsTab" class="TabContent" sbInclude="/components/sbo-input/" sbSheetStyle="operator"></div>
       <div id="TeamsTab" class="TabContent">
@@ -40,8 +40,19 @@
 
     <div class="sbTemplates">
       <div id="loginDialog" class="sbSegment">
+        <div class="sbGroup">This login is used to store your settings and keybindings on this copy of CRG.</div>
         <div class="sbGroup">
-          <span>Operator: <input type="text" sbOn="keyup: loginOnEnter" /></span>
+          <span>Known Operator: </span>
+          <select sbContext="ScoreBoard.Settings">
+            <option
+              sbForeach="Setting:: name: part=3, filter=ScoreBoard.Operator, noId"
+              sbAttr="value:: toOperatorName"
+              sbDisplay=": toOperatorName"
+            ></option>
+          </select>
+        </div>
+        <div class="sbGroup">
+          <span>New Operator: <input type="text" sbOn="keyup: loginOnEnter" /></span>
         </div>
       </div>
     </div>
