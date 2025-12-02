@@ -88,6 +88,10 @@ public enum Rule {
     POINTS_ON_INITIAL(new BooleanRule("Score.PointsOnInitial",
                                       "Don't advance out of initial trip when points are added", false, "Enabled",
                                       "Disabled")),
+    ENFORCE_TIME_TO_OR(new BooleanRule("Score.EnforceTimeToOr",
+                                       "If either team has an OR left, disallow setting final score earlier than 30s " +
+                                       "after the end of the period or earlier than 10s after the last score change",
+                                       true, "Enabled", "Disabled")),
 
     PENALTIES_FILE(new StringRule("Penalties.DefinitionFile",
                                   "File that contains the penalty code definitions to be used",

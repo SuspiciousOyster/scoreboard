@@ -115,6 +115,7 @@ public class ScoreBoardJSONListenerTests {
         g.startJam();
         g.getClock(Clock.ID_PERIOD).setTime(0);
         g.stopJamTO();
+        advance(30000);
         g.setOfficialScore(true);
         advance(0);
         assertEquals(true, state.get("ScoreBoard.Game(" + gameId + ").OfficialScore"));
@@ -449,9 +450,7 @@ public class ScoreBoardJSONListenerTests {
         dir.newFile("html/images/fullscreen/new.png");
 
         // In general Java's macOS implementation takes longer for file system notifications.
-        Thread.sleep(System.getProperty("os.name").toLowerCase().matches("^mac.*os.*$")
-                     ? 10000 
-                     : 100);
+        Thread.sleep(System.getProperty("os.name").toLowerCase().matches("^mac.*os.*$") ? 10000 : 100);
         assertEquals(null, state.get("ScoreBoard.Media.Format(images).Type(teamlogo.File(init.png).Id"));
         assertEquals(null, state.get("ScoreBoard.Media.Format(images).Type(teamlogo.File(init.png).Name"));
         assertEquals(null, state.get("ScoreBoard.Media.Format(images).Type(teamlogo.File(init.png).Src"));

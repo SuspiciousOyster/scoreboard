@@ -25,7 +25,8 @@
     </div>
     <div class="sbGroup sbHide" id="EndOfPeriod">
       <button
-        sbClass="sbClickMe: InPeriod, OfficialScore, Team(*).Score, Clock(Period).Number, Rule(Period.Number): opClickOfficial"
+        sbClass="sbClickMe: InPeriod, OfficialScore, Team(*).Score, Clock(Period).Number, Rule(Period.Number), InhibitFinalScore: opClickOfficial"
+        sbProp="disabled: InhibitFinalScore"
         sbToggle="OfficialScore"
       >
         Official Score
