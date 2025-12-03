@@ -97,7 +97,8 @@ function opClickOfficial(k) {
   const last = WS.state[k.upTo('Game') + '.Rule(Period.Number)'] == WS.state[k.upTo('Game') + '.Clock(Period).Number'];
   const tie = WS.state[k.upTo('Game') + '.Team(1).Score'] === WS.state[k.upTo('Game') + '.Team(2).Score'];
   const official = isTrue(WS.state[k.upTo('Game') + '.OfficialScore']);
-  return noPeriod && last && !tie && !official;
+  const inhibited = isTrue(WS.state[k.upTo('Game') + '.InhibitFinalScore']);
+  return noPeriod && last && !tie && !official && !inhibited;
 }
 
 function opToggleEndOfPeriod(k, v, elem) {

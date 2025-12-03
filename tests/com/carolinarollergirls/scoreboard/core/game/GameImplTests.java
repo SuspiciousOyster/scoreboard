@@ -242,6 +242,18 @@ public class GameImplTests {
         fastForwardPeriod();
         fastForwardPeriod();
 
+        // can't set final within 30s after end
+        g.setOfficialScore(true);
+        assertFalse(g.isOfficialScore());
+
+        // cant set final score within 10s after score change
+        advance(25000);
+        g.getTeam(Team.ID_1).set(Team.TRIP_SCORE, 1);
+        advance(6000);
+        g.setOfficialScore(true);
+        assertFalse(g.isOfficialScore());
+
+        advance(5000);
         g.setOfficialScore(true);
         assertTrue(g.isOfficialScore());
         assertEquals(1, collectedEvents.size());

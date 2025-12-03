@@ -52,6 +52,7 @@ import com.carolinarollergirls.scoreboard.rules.Rule;
 import com.carolinarollergirls.scoreboard.rules.RuleDefinition;
 import com.carolinarollergirls.scoreboard.utils.BasePath;
 import com.carolinarollergirls.scoreboard.utils.ClockConversion;
+import com.carolinarollergirls.scoreboard.utils.Logger;
 import com.carolinarollergirls.scoreboard.utils.ScoreBoardClock;
 import com.carolinarollergirls.scoreboard.utils.StatsbookExporter;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
@@ -135,6 +136,10 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
         setRecalculated(EXPORT_BLOCKED_BY)
             .addSource(get(TEAM, Team.ID_1), Team.SCORE_ADJUSTMENT)
             .addSource(get(TEAM, Team.ID_2), Team.SCORE_ADJUSTMENT);
+        setRecalculated(INHIBIT_FINAL_SCORE)
+            .addSource(this, IN_PERIOD)
+            .addIndirectSource(this, CURRENT_TIMEOUT, Timeout.RUNNING)
+            .addSource(getClock(Clock.ID_INTERMISSION), Clock.TIME);
         set(IN_JAM, false);
         set(NAME_FORMAT, "");
         removeAll(Period.JAM);
@@ -236,11 +241,17 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
                 }
             }));
 
-        // handle score changes after end of game (label update)
+        // handle score changes after end of game (label update, time for ORs)
         addScoreBoardListener(new ConditionalScoreBoardListener<>(Team.class, Team.SCORE, new ScoreBoardListener() {
             @Override
             public void scoreBoardChange(ScoreBoardEvent<?> event) {
                 if (isOvertimeConditions(false)) { setLabels(); }
+                if (getTeam(Team.ID_1).get(Team.OFFICIAL_REVIEWS) > 0 ||
+                    getTeam(Team.ID_2).get(Team.OFFICIAL_REVIEWS) > 0) {
+                    earliestFinalScoreTime =
+                        Math.max(earliestFinalScoreTime, ScoreBoardClock.getInstance().getCurrentTime() + (10 * 1000));
+                    set(INHIBIT_FINAL_SCORE, true);
+                }
             }
         }));
 
@@ -357,13 +368,15 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
             } else {
                 return State.FINISHED;
             }
-        } else if (prop == OFFICIAL_SCORE) {
-            if (this == scoreBoard.getCurrentGame() && getCurrentPeriod().isRunning() &&
-                !getCurrentTimeout().isRunning()) {
+        } else if (prop == INHIBIT_FINAL_SCORE) {
+            return getBoolean(Rule.ENFORCE_TIME_TO_OR) && this == scoreBoard.getCurrentGame().get(CurrentGame.GAME) &&
                 // Only allow a running game to be ended prematurely during intermission or a
                 // timeout
-                return false;
-            }
+                ((getCurrentPeriod().isRunning() && !getCurrentTimeout().isRunning()) ||
+                 // only allow final score at the end of a game after teams had a chance to OR the last decisions
+                 ScoreBoardClock.getInstance().getCurrentTime() < earliestFinalScoreTime);
+        } else if (prop == OFFICIAL_SCORE) {
+            if (get(INHIBIT_FINAL_SCORE)) { return false; }
         } else if (prop == EXPORT_BLOCKED_BY) {
             if (!getTeam(Team.ID_1).getAll(Team.SCORE_ADJUSTMENT).isEmpty() ||
                 !getTeam(Team.ID_2).getAll(Team.SCORE_ADJUSTMENT).isEmpty()) {
@@ -824,6 +837,9 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
         } else if (lineupFollows) {
             _possiblyEndPeriod();
         }
+        if (getTeam(Team.ID_1).get(Team.OFFICIAL_REVIEWS) > 0 || getTeam(Team.ID_2).get(Team.OFFICIAL_REVIEWS) > 0) {
+            earliestFinalScoreTime = ScoreBoardClock.getInstance().getCurrentTime() + getLong(Rule.LINEUP_DURATION);
+        }
         jsonSnapshotter.writeOnNextUpdate();
     }
     private void _startLineup() {
@@ -1200,6 +1216,7 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
     protected long lastButtonTime = ScoreBoardClock.getInstance().getCurrentTime();
     protected static long quickClockThreshold = 1000; // ms
     protected boolean quickClockAlwaysAllowed = false;
+    protected long earliestFinalScoreTime = ScoreBoardClock.getInstance().getCurrentTime();
 
     protected StatsbookExporter statsbookExporter;
     protected JSONStateSnapshotter jsonSnapshotter;
