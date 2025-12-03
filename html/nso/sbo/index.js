@@ -59,10 +59,11 @@ function Logout() {
 function showLoginDialog() {
   WS.SetupDialog($('#loginDialog'), '', {
     modal: true,
+    width: '400px',
     title: 'Operator Login',
     buttons: {
       Login: function () {
-        _login($(this).find('input').val() || 'default');
+        _login($(this).find('input').val() || $(this).find('select').val() || 'default');
         $(this).dialog('close');
       },
     },
@@ -74,4 +75,8 @@ function loginOnEnter(k, v, elem, event) {
     _login(elem.val() || 'default');
     sbCloseDialog(k, v, elem, event);
   }
+}
+
+function toOperatorName(k) {
+  return k.Setting.split('.')[2];
 }
