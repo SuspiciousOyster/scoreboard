@@ -26,19 +26,15 @@ function filToPreviewElem(k, v) {
   return k.Format === 'game-data'
     ? ''
     : (k.Format === 'images' ? '<img' : k.Format === 'videos' ? '<video' : '<iframe') +
-        ' src="/' +
-        (k.Format === 'themes' ? '?theme=' : '') +
-        k.Format +
-        '/' +
-        k.Type +
-        '/' +
-        k.File +
-        '">';
+    ' src="' +
+    (k.Format === 'themes' ? '/?theme=' : '') +
+    v +
+    '">';
 }
 
 function filCreateRemoveDialog(k, v, elem) {
   var div = $('div.RemoveMediaDialog').clone(true);
-  div.find('a.File').text(k.Format + '/' + k.Type + '/' + k.File);
+  div.find('span.File').text(WS.state[k + '.Src']);
   div.dialog({
     title: 'Remove media',
     modal: true,

@@ -111,21 +111,23 @@ public class MediaImpl extends ScoreBoardEventProviderImpl<Media> implements Med
         return !fn.matches("(^\\.)|(\\.[dD][bB]$)|\\\\|/");
     }
 
-    private void mediaFileCreated(String format, String type, String id) {
+    private void mediaFileCreated(String format, String type, String filename) {
         synchronized (coreLock) {
             MediaType mt = getFormat(format).getType(type);
+            String id = filename.replaceAll("[\\[\\]()]", "_");
             if (mt.getFile(id) == null) {
                 // URL paths always use forward slashes.
-                String p = "/" + format + "/" + type + "/" + id;
+                String p = "/" + format + "/" + type + "/" + filename;
                 // Name is the filename without the extension.
-                mt.addFile(new MediaFileImpl(mt, id, id.replaceFirst("\\.[^.]*$", ""), p));
+                mt.addFile(new MediaFileImpl(mt, id, filename.replaceFirst("\\.[^.]*$", ""), p));
             }
         }
     }
 
-    private void mediaFileDeleted(String format, String type, String id) {
+    private void mediaFileDeleted(String format, String type, String filename) {
         synchronized (coreLock) {
             MediaType mt = getFormat(format).getType(type);
+            String id = filename.replaceAll("[\\[\\]()]", "_");
             mt.removeFile(mt.getFile(id));
         }
     }
@@ -144,22 +146,26 @@ public class MediaImpl extends ScoreBoardEventProviderImpl<Media> implements Med
     public boolean removeMediaFile(String format, String type, String id) {
         synchronized (coreLock) {
             try {
-                // Check the directory is one the user is meant to be able to change.
-                if (getFormat(format).getType(type) != null) {
+                // Check the file is one we manage.
+                if (getFormat(format) != null && getFormat(format).getType(type) != null &&
+                    getFormat(format).getType(type).getFile(id) != null) {
                     // Delete the file, and let inotify take care of handling the change.
-                    Files.walkFileTree(path.resolve(format).resolve(type).resolve(id), new SimpleFileVisitor<Path>() {
-                        @Override
-                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                            Files.delete(file);
-                            return FileVisitResult.CONTINUE;
-                        }
+                    Files.walkFileTree(path.resolve(getFormat(format).getType(type).getFile(id).getSrc().substring(1)),
+                                       new SimpleFileVisitor<Path>() {
+                                           @Override
+                                           public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                                               throws IOException {
+                                               Files.delete(file);
+                                               return FileVisitResult.CONTINUE;
+                                           }
 
-                        @Override
-                        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                            Files.delete(dir);
-                            return FileVisitResult.CONTINUE;
-                        }
-                    });
+                                           @Override
+                                           public FileVisitResult postVisitDirectory(Path dir, IOException exc)
+                                               throws IOException {
+                                               Files.delete(dir);
+                                               return FileVisitResult.CONTINUE;
+                                           }
+                                       });
                     return true;
                 }
                 return false;

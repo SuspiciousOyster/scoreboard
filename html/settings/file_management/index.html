@@ -38,9 +38,9 @@
             </thead>
             <tbody>
               <tr sbForeach="File:: name: resort=Name" sbAttr="name: Name" class="Item">
-                <td class="Download"><a download class="Download" sbAttr="href: Id: sbToMediaPath" sbButton>Download</a></td>
+                <td class="Download"><a download class="Download" sbAttr="href: Src" sbButton>Download</a></td>
                 <td class="Name" sbClass="sbHide: Id: filIsGameData"><input type="text" class="Name" sbControl="Name" /></td>
-                <td class="Preview" sbClass="sbHide: Id: filIsGameData" sbDisplay="Id: filToPreviewElem: html"></td>
+                <td class="Preview" sbClass="sbHide: Id: filIsGameData" sbDisplay="Src: filToPreviewElem: html"></td>
                 <td colspan="2" class="Src" sbClass="sbHide: Id: filNoGameData" sbDisplay="Id"></td>
                 <td class="Remove"><button class="Remove" sbCall="filCreateRemoveDialog">Remove</button></td>
               </tr>
@@ -62,7 +62,7 @@
       <div class="RemoveMediaDialog sbSegment" sbContext="ScoreBoard.Media.Format(*).Type(*).File(*)">
         <div class="sbGroup">
           <div>
-            <p>File : <span class="File" sbDisplay=":sbToMediaPath"></span></p>
+            <p>File : <span class="File" sbDisplay="Src"></span></p>
             <p class="Warning">This will delete the file from your system. You cannot undo this operation.</p>
             <p class="Confirm">Are you sure?</p>
             <p class="Status"></p>
