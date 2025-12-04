@@ -52,7 +52,6 @@ import com.carolinarollergirls.scoreboard.rules.Rule;
 import com.carolinarollergirls.scoreboard.rules.RuleDefinition;
 import com.carolinarollergirls.scoreboard.utils.BasePath;
 import com.carolinarollergirls.scoreboard.utils.ClockConversion;
-import com.carolinarollergirls.scoreboard.utils.Logger;
 import com.carolinarollergirls.scoreboard.utils.ScoreBoardClock;
 import com.carolinarollergirls.scoreboard.utils.StatsbookExporter;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
@@ -558,7 +557,9 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
             }
             if (prop == PERIOD) {
                 int num = Integer.parseInt(id);
-                if (0 <= num && num <= getInt(Rule.NUMBER_PERIODS)) { return new PeriodImpl(this, num); }
+                if (0 <= num && (num <= getInt(Rule.NUMBER_PERIODS) || source.isFile())) {
+                    return new PeriodImpl(this, num);
+                }
             }
             if (prop == Team.BOX_TRIP) { return new BoxTripImpl(this, id); }
             if (prop == NSO) { return new OfficialImpl(this, id, NSO); }
