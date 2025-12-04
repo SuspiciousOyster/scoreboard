@@ -42,7 +42,7 @@ function _setOperatorSettings(op) {
 }
 
 function _login(name) {
-  name = name || '';
+  name = (name || '').replaceAll(/[.() ]/g, "_");
   $('#operatorId').text(name);
   _sbUpdateUrl('operator', name);
   _crgKeyControls.setupKeyControls(name);
