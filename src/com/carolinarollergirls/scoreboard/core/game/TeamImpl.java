@@ -37,6 +37,7 @@ import com.carolinarollergirls.scoreboard.event.ScoreBoardListener;
 import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.event.ValueWithId;
 import com.carolinarollergirls.scoreboard.rules.Rule;
+import com.carolinarollergirls.scoreboard.utils.ScoreBoardClock;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
 
 public class TeamImpl extends ScoreBoardEventProviderImpl<Team> implements Team {
@@ -211,6 +212,7 @@ public class TeamImpl extends ScoreBoardEventProviderImpl<Team> implements Team 
                             @Override
                             public void run() {
                                 execute(ADD_TRIP);
+                                lastTripAutoAdvance = ScoreBoardClock.getInstance().getCurrentTime();
                                 getCurrentTrip().getPrevious().set(ScoringTrip.JAM_CLOCK_END, tripScoreJamTime);
                             }
                         });
@@ -313,7 +315,12 @@ public class TeamImpl extends ScoreBoardEventProviderImpl<Team> implements Team 
     @Override
     public void execute(Command prop, Source source) {
         if (prop == ADD_TRIP) {
+            if (ScoreBoardClock.getInstance().getCurrentTime() < lastTripAutoAdvance + 1000 && get(TRIP_SCORE) == 0) {
+                // manual advance immediately after auto advance - ignore
+                return;
+            }
             tripScoreTimerTask.cancel();
+            lastTripAutoAdvance = 0;
             getRunningOrEndedTeamJam().addScoringTrip();
             if (!isLead() && !getOtherTeam().isLead()) { set(LOST, true); }
         } else if (prop == REMOVE_TRIP) {
@@ -963,6 +970,8 @@ public class TeamImpl extends ScoreBoardEventProviderImpl<Team> implements Team 
     };
     private long tripScoreJamTime; // store the jam clock when starting the timer so we can set the correct value
                                    // when advancing the trip
+    private long lastTripAutoAdvance = 0;
+
     private Game game;
     private String subId;
     private String nextSkaterId;
