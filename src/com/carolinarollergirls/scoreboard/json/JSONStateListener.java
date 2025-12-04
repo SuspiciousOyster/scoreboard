@@ -1,10 +1,8 @@
 package com.carolinarollergirls.scoreboard.json;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -52,8 +50,7 @@ public interface JSONStateListener {
                 if (head.subtries.containsKey(catchAllKey)) {
                     int j;
                     // id captured by * might contain . and thus be split - find the end
-                    for (j = i; j < p.length && !p[j].endsWith(")"); j++)
-                        ;
+                    for (j = i; j < p.length && !p[j].endsWith(")"); j++);
                     if (head.subtries.get(catchAllKey)._covers(p, j + 1)) { return true; }
                 }
                 head = head.subtries.get(p[i]);
@@ -112,12 +109,16 @@ public interface JSONStateListener {
 
         @Override
         public StateTrie clone() {
+            return _clone(false);
+        }
+        private StateTrie _clone(boolean nullValues) {
             StateTrie clone = new StateTrie();
             clone.isPath = isPath;
-            clone.value = value;
-            for (String key : subtries.keySet()) { clone.subtries.put(key, subtries.get(key).clone()); }
+            clone.value = nullValues ? null : value;
+            for (String key : subtries.keySet()) { clone.subtries.put(key, subtries.get(key)._clone(nullValues)); }
             return clone;
         }
+        private StateTrie _nulledClone() { return _clone(true); }
 
         public Object get(String key) { return _get(key.split("(?=[.(])"), 0); }
         private Object _get(String[] p, int i) {
@@ -176,50 +177,55 @@ public interface JSONStateListener {
             return isEmpty();
         }
 
-        public void mergeChangeTrie(StateTrie changeTrie) { _mergeChangeTrie(changeTrie, false); }
-        public boolean _mergeChangeTrie(StateTrie changeTrie, boolean removing) {
+        public StateTrie cloneAndMergeChangeTrie(StateTrie changeTrie) {
+            return _cloneAndMergeChangeTrie(changeTrie, false);
+        }
+        public StateTrie _cloneAndMergeChangeTrie(StateTrie changeTrie, boolean removing) {
+            StateTrie clone = new StateTrie();
             if (changeTrie.isPath) {
                 if (isPath && value.equals(changeTrie.value)) {
                     changeTrie.isPath = false;
+                    clone.value = value;
+                    clone.isPath = true;
                 } else {
                     changeTrie.isPath = isPath || changeTrie.value != null;
-                    value = changeTrie.value;
-                    isPath = value != null;
+                    clone.value = changeTrie.value;
+                    clone.isPath = clone.value != null;
                     removing = removing || value == null;
                 }
-            } else if (removing && isPath) {
-                value = null;
-                isPath = false;
+            } else {
+                clone.value = removing ? null : value;
+                clone.isPath = isPath && !removing;
             }
-            List<String> emptyChange = new ArrayList<>();
-            Set<String> trieKeys = new HashSet<>(subtries.keySet());
-            for (Entry<String, StateTrie> entry : changeTrie.subtries.entrySet()) {
-                String key = entry.getKey();
-                if (subtries.containsKey(key)) {
-                    if (subtries.get(key)._mergeChangeTrie(entry.getValue(), removing)) { subtries.remove(key); };
-                    if (entry.getValue().isEmpty()) { emptyChange.add(key); }
-                } else {
-                    StateTrie cleaned = changeTrie.subtries.get(key)._cleanAndClone();
-                    if (cleaned == null) {
-                        emptyChange.add(key);
+
+            Set<String> allKeys = new HashSet<>(subtries.keySet());
+            allKeys.addAll(changeTrie.subtries.keySet());
+            for (String key : allKeys) {
+                if (changeTrie.subtries.containsKey(key)) {
+                    if (subtries.containsKey(key)) {
+                        // exists in both - recurse
+                        StateTrie subclone =
+                            subtries.get(key)._cloneAndMergeChangeTrie(changeTrie.subtries.get(key), removing);
+                        if (!subclone.isEmpty()) { clone.subtries.put(key, subclone); }
+                        if (changeTrie.subtries.get(key).isEmpty()) { changeTrie.subtries.remove(key); }
                     } else {
-                        subtries.put(key, cleaned);
+                        // addition
+                        StateTrie subclone = changeTrie.subtries.get(key)._cleanAndClone();
+                        if (subclone == null) {
+                            changeTrie.subtries.remove(key);
+                        } else {
+                            clone.subtries.put(key, subclone);
+                        }
                     }
+                } else if (removing) {
+                    // removing - add keys to change set as removed, don't add to clone
+                    changeTrie.subtries.put(key, subtries.get(key)._nulledClone());
+                } else {
+                    // unchanged - reuse existing subtree for clone
+                    clone.subtries.put(key, subtries.get(key));
                 }
             }
-            for (String key : trieKeys) {
-                if (removing && !changeTrie.subtries.containsKey(key) && subtries.containsKey(key)) {
-                    changeTrie.subtries.put(key, subtries.get(key)._nullValues());
-                    subtries.remove(key);
-                }
-            }
-            for (String key : emptyChange) { changeTrie.subtries.remove(key); }
-            return isEmpty();
-        }
-        private StateTrie _nullValues() {
-            value = null;
-            for (StateTrie subtrie : subtries.values()) { subtrie._nullValues(); }
-            return this;
+            return clone;
         }
         private StateTrie _cleanAndClone() {
             if (value == null) { isPath = false; }

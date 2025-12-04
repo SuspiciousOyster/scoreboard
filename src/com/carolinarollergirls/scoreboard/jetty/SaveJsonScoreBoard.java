@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -23,8 +22,7 @@ public class SaveJsonScoreBoard extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
-        // Use a TreeMap to keep output sorted.
-        Map<String, Object> state = new TreeMap<>(jsm.getState());
+        Map<String, Object> state = jsm.getState();
 
         String path = request.getParameter("path");
         if (path != null) {

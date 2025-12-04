@@ -1,8 +1,5 @@
 package com.carolinarollergirls.scoreboard.json;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.carolinarollergirls.scoreboard.core.interfaces.ScoreBoard;
 import com.carolinarollergirls.scoreboard.event.Child;
 import com.carolinarollergirls.scoreboard.event.Property;
@@ -12,6 +9,7 @@ import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProviderImpl;
 import com.carolinarollergirls.scoreboard.event.ScoreBoardListener;
 import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.event.ValueWithId;
+import com.carolinarollergirls.scoreboard.json.JSONStateListener.StateTrie;
 import com.carolinarollergirls.scoreboard.utils.Logger;
 
 /**
@@ -62,31 +60,31 @@ public class ScoreBoardJSONListener implements ScoreBoardListener {
         synchronized (this) {
             if (updates.isEmpty()) { return; }
             jsm.updateState(updates);
-            updates.clear();
+            updates = new StateTrie();
         }
     }
 
     private void update(String prefix, Property<?> prop, Object v) {
         String path = prefix + "." + prop.getJsonName();
         if (prop instanceof Child) {
-            updates.add(new WSUpdate(path + "(" + ((ValueWithId) v).getId() + ")", ((ValueWithId) v).getValue()));
+            updates.add(path + "(" + ((ValueWithId) v).getId() + ")", ((ValueWithId) v).getValue());
         } else if (v instanceof ScoreBoardEventProvider) {
-            updates.add(new WSUpdate(path, ((ScoreBoardEventProvider) v).getId()));
+            updates.add(path, ((ScoreBoardEventProvider) v).getId());
         } else if (v == null || v instanceof Boolean || v instanceof Integer || v instanceof Long) {
-            updates.add(new WSUpdate(path, v));
+            updates.add(path, v);
         } else {
-            updates.add(new WSUpdate(path, v.toString()));
+            updates.add(path, v.toString());
         }
     }
 
     private void remove(String prefix, Property<?> prop, String id) {
         String path = prefix + "." + prop.getJsonName() + "(" + id + ")";
-        updates.add(new WSUpdate(path, null));
+        updates.add(path, null);
     }
 
     private void process(ScoreBoardEventProvider p, boolean remove) {
         String path = getPath(p);
-        updates.add(new WSUpdate(path, null));
+        updates.add(path, null);
         if (remove) { return; }
 
         for (Property<?> prop : p.getProperties()) {
@@ -114,6 +112,6 @@ public class ScoreBoardJSONListener implements ScoreBoardListener {
     }
 
     private JSONStateManager jsm;
-    private List<WSUpdate> updates = new LinkedList<>();
+    private StateTrie updates = new StateTrie();
     private long batch = 0;
 }

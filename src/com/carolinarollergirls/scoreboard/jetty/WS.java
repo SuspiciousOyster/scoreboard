@@ -118,7 +118,7 @@ public class WS extends WebSocketServlet {
         }
 
         @OnWebSocketMessage
-        public synchronized void onMessage(Session session, String message_data) {
+        public void onMessage(Session session, String message_data) {
             if (useMetrics) { messagesReceived.inc(); }
             try {
                 Map<String, Object> json = JSON.std.mapFrom(message_data);
@@ -135,8 +135,10 @@ public class WS extends WebSocketServlet {
                     if (jsonPaths != null) {
                         PathTrie newPaths = new PathTrie();
                         for (Object p : jsonPaths) { newPaths.add((String) p); }
-                        sendWSUpdates(newPaths, state);
-                        this.paths.merge(newPaths);
+                        synchronized (state) {
+                            sendWSUpdates(newPaths, state);
+                            this.paths.merge(newPaths);
+                        }
                     }
                     break;
                 case "Set":
@@ -308,12 +310,14 @@ public class WS extends WebSocketServlet {
 
         // State changes from JSONStateManager.
         @Override
-        public synchronized void sendUpdates(StateTrie fullState, StateTrie changedState) {
-            this.state = fullState;
-            sendWSUpdates(paths, changedState);
+        public void sendUpdates(StateTrie fullState, StateTrie changedState) {
+            synchronized (state) {
+                state = fullState;
+                sendWSUpdates(paths, changedState);
+            }
         }
 
-        private synchronized void sendWSUpdates(PathTrie registered, StateTrie updated) {
+        private void sendWSUpdates(PathTrie registered, StateTrie updated) {
             Map<String, Object> updates = registered.intersect(updated, true);
             if (updates.size() == 0) { return; }
             Map<String, Object> json = new HashMap<>();
