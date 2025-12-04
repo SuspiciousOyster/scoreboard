@@ -144,7 +144,3 @@ function _sbRsGetParents(rs) {
 function sbIndentByParents(k, v) {
   return '&nbsp;'.repeat(3 * (_sbRsGetParents(k.Ruleset).length - 1)) + v;
 }
-
-function sbToMediaPath(k) {
-  return '/' + k.Format + '/' + k.Type + '/' + k.File;
-}

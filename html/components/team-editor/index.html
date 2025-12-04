@@ -22,7 +22,7 @@
         <option
           sbForeach="File::name: resort=Name"
           sbContext="/ScoreBoard.Media.Format(images).Type(teamlogo)"
-          sbAttr="name: Name | value:-:sbToMediaPath"
+          sbAttr="name: Name | value: Src"
           sbDisplay="Name"
         ></option>
       </select>
@@ -58,13 +58,7 @@
               <option value="">Other</option>
               <option sbForeach="UniformColor::value:noId" sbAttr="value:" sbDisplay=" "></option>
             </select>
-            <input
-              type="text"
-              class="Name"
-              size="15"
-              sbClass="sbHide: UniformColor, PreparedTeam: tmeIsNotOtherUc"
-              sbControl="UniformColor"
-            />
+            <input type="text" class="Name" size="15" sbClass="sbHide: UniformColor, PreparedTeam: tmeIsNotOtherUc" sbControl="UniformColor" />
           </span>
           <span sbClass="sbHide:-: tmeNotPrepared">
             <span sbForeach="UniformColor:: name:noId" sbAttr="name:" class="RemoveColor">
@@ -182,9 +176,7 @@
 
   <div id="ColorsDialog" class="sbSegment">
     <div class="sbGroup">
-      <span
-        >Type: <input id="newType" type="text" size="15" sbOn="focus: tmeStartAutocomplete" /> <button sbCall="tmeAddColor">Add</button>
-      </span>
+      <span>Type: <input id="newType" type="text" size="15" sbOn="focus: tmeStartAutocomplete" /> <button sbCall="tmeAddColor">Add</button> </span>
     </div>
     <table class="sbGroup">
       <thead class="sbHeader">

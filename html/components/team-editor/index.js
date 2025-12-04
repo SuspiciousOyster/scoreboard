@@ -11,7 +11,7 @@ $('#teamLogoUpload').fileupload({
     data.submit();
   },
   done: function (e, data) {
-    WS.Set(WS._getContext($('#teamLogoUpload'))[0] + '.Logo', '/images/teamlogo/' + data.files[0].name);
+    WS.Set(WS._getContext($(data.fileInput[0]))[0] + '.Logo', '/images/teamlogo/' + data.files[0].name);
   },
   fail: function (e, data) {
     console.error('Failed upload', data.errorThrown);
@@ -36,8 +36,8 @@ function tmeIsOrHasPrepared(k, v) {
   return sbIsNotEmpty(k, v) || !!k.PreparedTeam;
 }
 
-function tmeTriggerUpload() {
-  $('#teamLogoUpload').trigger('click');
+function tmeTriggerUpload(k, v, elem) {
+  elem.siblings('#teamLogoUpload').trigger('click');
 }
 
 function tmeOpenAlternateNamesDialog(k) {
