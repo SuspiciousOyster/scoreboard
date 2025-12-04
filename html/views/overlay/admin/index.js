@@ -3,6 +3,7 @@ var currrentPanel = '';
 
 (function () {
   $('#PanelSelect').val('');
+  $('#Preview>iframe').css('width', $('#PreviewSize [dim="width"]').val()).css('height', $('#PreviewSize [dim="height"]').val())
 })();
 
 function ovaKeyHandler(k, v, elem, e) {
