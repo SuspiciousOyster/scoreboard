@@ -680,7 +680,7 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
     @Override
     public void startJam() {
         synchronized (coreLock) {
-            if (!isInJam() && !isOfficialScore() && !quickClockControl(Button.START)) {
+            if (!isInJam() && !restoreRunning && !isOfficialScore() && !quickClockControl(Button.START)) {
                 createSnapshot(ACTION_START_JAM);
                 _startJam();
                 finishReplace();
@@ -691,7 +691,7 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
     public void stopJamTO() {
         synchronized (coreLock) {
             Clock lc = getClock(Clock.ID_LINEUP);
-            if ((getCurrentTimeout().isRunning() || !lc.isRunning()) && !isOfficialScore() &&
+            if ((getCurrentTimeout().isRunning() || !lc.isRunning()) && !restoreRunning && !isOfficialScore() &&
                 !quickClockControl(Button.STOP)) {
                 autostartRan = false;
 
@@ -719,7 +719,7 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
     @Override
     public void timeout() {
         synchronized (coreLock) {
-            if (!isOfficialScore() && !quickClockControl(Button.TIMEOUT)) {
+            if (!restoreRunning && !isOfficialScore() && !quickClockControl(Button.TIMEOUT)) {
                 if (getCurrentTimeout().isRunning()) {
                     createSnapshot(ACTION_RE_TIMEOUT);
                 } else {
@@ -736,6 +736,7 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
             Clock tc = getClock(Clock.ID_TIMEOUT);
             Clock pc = getClock(Clock.ID_PERIOD);
 
+            if (restoreRunning) { return; }
             if (!getCurrentTimeout().isRunning()) { timeout(); }
             getCurrentTimeout().set(Timeout.REVIEW, review);
             getCurrentTimeout().set(Timeout.OWNER, owner);
@@ -934,7 +935,7 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
         long triggerTime =
             bufferTime + (isInOvertime() ? getLong(Rule.OVERTIME_LINEUP_DURATION) : getLong(Rule.LINEUP_DURATION));
 
-        if (lc.getTimeElapsed() >= triggerTime && !autostartRan) {
+        if (!restoreRunning && lc.getTimeElapsed() >= triggerTime && !autostartRan) {
             autostartRan = true;
             if (Clock.ID_JAM.equals(getSetting(ScoreBoard.SETTING_AUTO_START))) {
                 startJam();
@@ -947,8 +948,11 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
         }
     }
 
-    protected void createSnapshot(String type) { snapshot = new GameSnapshot(this, type); }
+    protected void createSnapshot(String type) {
+        if (!restoreRunning) { snapshot = new GameSnapshot(this, type); }
+    }
     protected void restoreSnapshot() {
+        restoreRunning = true;
         ScoreBoardClock.getInstance().rewindTo(snapshot.getSnapshotTime());
         set(CURRENT_PERIOD, snapshot.getCurrentPeriod());
         getCurrentPeriod().restoreSnapshot(snapshot.getPeriodSnapshot());
@@ -969,6 +973,7 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
                 bt.restoreSnapshot(snapshot.getBoxTripSnapshot(bt.getId()));
             }
         }
+        restoreRunning = false;
     }
     protected void finishReplace() {
         if (replacePending != null) {
@@ -1208,6 +1213,7 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
     protected GameSnapshot snapshot = null;
     protected String replacePending = null;
     protected boolean autostartRan = false;
+    protected boolean restoreRunning = false;
 
     protected static File jsonDirectory = new File(BasePath.get(), "html/game-data/json");
 
