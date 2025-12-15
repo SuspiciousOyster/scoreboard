@@ -1,9 +1,8 @@
 package com.carolinarollergirls.scoreboard.json;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,11 +27,11 @@ public class JSONStateManager {
                                         : null;
     }
 
-    public synchronized void register(JSONStateListener source) {
+    public void register(JSONStateListener source) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        sources.put(source, executor);
+        synchronized (sources) { sources.put(source, executor); }
         // Send on the current state asynchronously.
-        final StateTrie localState = state.clone();
+        final StateTrie localState = state;
         pending.incrementAndGet();
         executor.execute(new Runnable() {
             @Override
@@ -43,31 +42,32 @@ public class JSONStateManager {
         });
     }
 
-    public synchronized void unregister(JSONStateListener source) {
-        sources.get(source).shutdownNow();
-        sources.remove(source);
+    public void unregister(JSONStateListener source) {
+        synchronized (sources) {
+            sources.get(source).shutdownNow();
+            sources.remove(source);
+        }
     }
 
     public void updateState(String key, Object value) {
-        List<WSUpdate> updates = new ArrayList<>();
-        updates.add(new WSUpdate(key, value));
+        StateTrie updates = new StateTrie();
+        updates.add(key, value);
         updateState(updates);
     }
 
-    public synchronized void updateState(List<WSUpdate> updates) {
+    public void updateState(StateTrie updates) {
         Histogram.Timer timer = useMetrics ? updateStateDuration.startTimer() : null;
-        StateTrie changedState = new StateTrie();
 
-        for (WSUpdate update : updates) { changedState.add(update.getKey(), update.getValue()); }
-
-        state.mergeChangeTrie(changedState);
-        if (!changedState.isEmpty()) {
-            final StateTrie localState = state.clone();
-            final StateTrie localChanged = changedState.clone();
+        synchronized (state) { state = state.cloneAndMergeChangeTrie(updates); }
+        if (!updates.isEmpty()) {
+            final StateTrie localState = state;
+            final StateTrie localChanged = updates;
 
             // Send updates async, as the WS connections can block if the
             // kernel TCP send buffer fills up.
-            for (JSONStateListener source : sources.keySet()) {
+            Set<JSONStateListener> sourceSet;
+            synchronized (sources) { sourceSet = sources.keySet(); }
+            for (JSONStateListener source : sourceSet) {
                 final JSONStateListener localSource = source;
                 pending.incrementAndGet();
                 sources.get(source).execute(new Runnable() {
@@ -79,11 +79,12 @@ public class JSONStateManager {
                 });
             }
         }
+
         if (useMetrics) { timer.observeDuration(); }
         if (useMetrics) { updateStateUpdates.observe(updates.size()); }
     }
 
-    public synchronized Map<String, Object> getState() { return state.getAll(false); }
+    public Map<String, Object> getState() { return state.getAll(false); }
 
     // For unittests.
     protected void waitForSent() {

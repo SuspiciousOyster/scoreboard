@@ -2,12 +2,12 @@ package com.carolinarollergirls.scoreboard.json;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.carolinarollergirls.scoreboard.json.JSONStateListener.StateTrie;
 
 public class JSONStateManagerTests {
     private JSONStateManager jsm;
@@ -82,9 +82,9 @@ public class JSONStateManagerTests {
         jsm.waitForSent();
         assertEquals(3, listener.state.size());
 
-        List<WSUpdate> updates = new ArrayList<>();
-        updates.add(new WSUpdate("foo.12", null));
-        updates.add(new WSUpdate("foo.12.78", "bar"));
+        StateTrie updates = new StateTrie();
+        updates.add("foo.12", null);
+        updates.add("foo.12.78", "bar");
         jsm.updateState(updates);
         jsm.waitForSent();
         assertEquals(2, listener.state.size());
@@ -121,9 +121,9 @@ public class JSONStateManagerTests {
     public void delete_and_recreate_in_one_update() {
         jsm.register(listener);
         jsm.updateState("foo.1", "bar");
-        List<WSUpdate> updates = new ArrayList<>();
-        updates.add(new WSUpdate("foo", null));
-        updates.add(new WSUpdate("foo.1", "baz"));
+        StateTrie updates = new StateTrie();
+        updates.add("foo", null);
+        updates.add("foo.1", "baz");
         jsm.updateState(updates);
 
         HashMap<String, Object> hm = new HashMap<>();

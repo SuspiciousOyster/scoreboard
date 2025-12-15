@@ -526,11 +526,11 @@ public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game 
         } else if (prop == OFFICIAL_TIMEOUT) {
             setTimeoutType(Timeout.Owners.OTO, false);
         } else if (prop == EXPORT) {
-            jsonSnapshotter.writeFile();
             if (statsbookExporter == null) {
                 set(UPDATE_IN_PROGRESS, true);
                 statsbookExporter = new StatsbookExporter(this);
             }
+            jsonSnapshotter.writeFile();
         } else if (prop == START_BOX_TRIP) {
             add(Team.BOX_TRIP, new BoxTripImpl(this));
         } else if (prop == START_JAMMER_BOX_TRIP) {

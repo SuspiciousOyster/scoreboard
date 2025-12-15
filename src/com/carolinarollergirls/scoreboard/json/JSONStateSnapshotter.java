@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 
@@ -31,15 +32,12 @@ public class JSONStateSnapshotter implements JSONStateListener {
     }
 
     @Override
-    public synchronized void sendUpdates(StateTrie newState, StateTrie changedState) {
+    public void sendUpdates(StateTrie newState, StateTrie changedState) {
         state = newState;
-        if (writeOnNextUpdate) {
-            writeOnNextUpdate = false;
-            writeFile();
-        }
+        if (writeOnNextUpdate.getAndSet(false)) { writeFile(); }
     }
 
-    public void writeOnNextUpdate() { writeOnNextUpdate = true; }
+    public void writeOnNextUpdate() { writeOnNextUpdate.set(true); }
 
     public synchronized void writeFile() {
         Histogram.Timer timer = useMetrics ? updateStateDuration.startTimer() : null;
@@ -85,7 +83,7 @@ public class JSONStateSnapshotter implements JSONStateListener {
 
     private File directory;
     private Game game;
-    private boolean writeOnNextUpdate = false;
+    private AtomicBoolean writeOnNextUpdate = new AtomicBoolean(false);
     private StateTrie state = new StateTrie();
     private PathTrie filters = new PathTrie();
 

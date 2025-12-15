@@ -47,23 +47,11 @@ public class AutoSaveJSONState implements Runnable {
     @Override
     public synchronized void run() {
         Histogram.Timer timer = useMetrics ? autosaveDuration.startTimer() : null;
-        try {
-            int n = AUTOSAVE_FILES;
-            getFile(n).delete();
-            while (n > 0) {
-                File to = getFile(n);
-                File from = getFile(--n);
-                if (from.exists()) { from.renameTo(to); }
-            }
-            writeAutoSave(getFile(0));
-        } catch (Exception e) {
-            Logger.printMessage("WARNING: Unable to auto-save scoreboard : " + e.getMessage());
-            Logger.printStackTrace(e);
-        }
+        writeAutoSave();
         if (useMetrics) { timer.observeDuration(); }
     }
 
-    private void writeAutoSave(File file) {
+    private void writeAutoSave() {
         File tmp = null;
         OutputStreamWriter out = null;
         try {
@@ -73,10 +61,20 @@ public class AutoSaveJSONState implements Runnable {
                               .putObject("state", jsm.getState())
                               .end()
                               .finish();
+            File file = getFile(0);
             tmp = File.createTempFile(file.getName(), ".tmp", dir);
             out = new OutputStreamWriter(new FileOutputStream(tmp), StandardCharsets.UTF_8);
             out.write(json);
             out.close();
+
+            // rotate files
+            int n = AUTOSAVE_FILES;
+            getFile(n).delete();
+            while (n > 0) {
+                File to = getFile(n);
+                File from = getFile(--n);
+                if (from.exists()) { from.renameTo(to); }
+            }
             tmp.renameTo(file); // This is atomic.
         } catch (Exception e) {
             Logger.printMessage("Error writing JSON autosave: " + e.getMessage());
