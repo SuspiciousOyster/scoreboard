@@ -3,6 +3,7 @@ package com.carolinarollergirls.scoreboard.event;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("this-escape")
 public abstract class OrderedScoreBoardEventProviderImpl<C extends OrderedScoreBoardEventProvider<C>>
     extends ScoreBoardEventProviderImpl<C> implements OrderedScoreBoardEventProvider<C> {
     @SuppressWarnings("unchecked")

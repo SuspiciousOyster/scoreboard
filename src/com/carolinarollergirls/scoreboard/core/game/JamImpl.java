@@ -18,7 +18,7 @@ import com.carolinarollergirls.scoreboard.rules.Rule;
 import com.carolinarollergirls.scoreboard.utils.Logger;
 import com.carolinarollergirls.scoreboard.utils.ScoreBoardClock;
 
-public class JamImpl extends NumberedScoreBoardEventProviderImpl<Jam> implements Jam {
+public final class JamImpl extends NumberedScoreBoardEventProviderImpl<Jam> implements Jam {
     public JamImpl(ScoreBoardEventProvider parent, Jam prev) {
         this(parent, prev.getNumber() + 1);
         setNext(prev.getNext());

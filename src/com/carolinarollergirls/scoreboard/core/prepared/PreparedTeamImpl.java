@@ -11,7 +11,7 @@ import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProvider;
 import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProviderImpl;
 import com.carolinarollergirls.scoreboard.event.Value;
 
-public class PreparedTeamImpl extends ScoreBoardEventProviderImpl<PreparedTeam> implements PreparedTeam {
+public final class PreparedTeamImpl extends ScoreBoardEventProviderImpl<PreparedTeam> implements PreparedTeam {
     public PreparedTeamImpl(ScoreBoard parent, String id) {
         super(parent, id, ScoreBoard.PREPARED_TEAM);
         addProperties(props);
@@ -79,7 +79,7 @@ public class PreparedTeamImpl extends ScoreBoardEventProviderImpl<PreparedTeam> 
         }
     }
 
-    public static class PreparedTeamSkaterImpl
+    public final static class PreparedTeamSkaterImpl
         extends ScoreBoardEventProviderImpl<PreparedSkater> implements PreparedSkater {
         public PreparedTeamSkaterImpl(PreparedTeam parent, String id) {
             super(parent, id, PreparedTeam.SKATER);

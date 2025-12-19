@@ -12,7 +12,7 @@ import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.rules.Rule;
 import com.carolinarollergirls.scoreboard.utils.ScoreBoardClock;
 
-public class PenaltyImpl extends NumberedScoreBoardEventProviderImpl<Penalty> implements Penalty {
+public final class PenaltyImpl extends NumberedScoreBoardEventProviderImpl<Penalty> implements Penalty {
     public PenaltyImpl(Skater s, int n) {
         super(s, n, Skater.PENALTY);
         game = s.getTeam().getGame();

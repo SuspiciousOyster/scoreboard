@@ -19,7 +19,7 @@ import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.event.ValueWithId;
 import com.carolinarollergirls.scoreboard.rules.Rule;
 
-public class TeamJamImpl extends ParentOrderedScoreBoardEventProviderImpl<TeamJam> implements TeamJam {
+public final class TeamJamImpl extends ParentOrderedScoreBoardEventProviderImpl<TeamJam> implements TeamJam {
     public TeamJamImpl(Jam j, String teamId) {
         super(j, teamId, Jam.TEAM_JAM);
         addProperties(props);

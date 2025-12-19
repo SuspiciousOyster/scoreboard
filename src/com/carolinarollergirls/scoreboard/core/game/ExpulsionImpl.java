@@ -9,7 +9,7 @@ import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProviderImpl;
 import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.penalties.PenaltyCode;
 
-public class ExpulsionImpl extends ScoreBoardEventProviderImpl<Expulsion> implements Expulsion {
+public final class ExpulsionImpl extends ScoreBoardEventProviderImpl<Expulsion> implements Expulsion {
     ExpulsionImpl(Game g, Penalty p) {
         super(g, p.getId(), Game.EXPULSION);
         game = g;

@@ -28,7 +28,7 @@
 	<property name="compile.deprecation" value="true"/>
 	<property name="compile.debug" value="true"/>
 	<property name="compile.nowarn" value="false"/>
-	<property name="compile.verbose" value="true"/>
+	<property name="compile.verbose" value="false"/>
 
 	<property name="jar.dir" value="lib"/>
 	<property name="jar.file" value="crg-scoreboard.jar"/>
@@ -50,10 +50,6 @@
 	<path id="classpath.test">
 		<pathelement location="test-libs/junit-4.13.2.jar"/>
 		<pathelement location="test-libs/hamcrest-2.2.jar"/>
-		<pathelement location="test-libs/mockito-core-4.2.0.jar"/>
-		<pathelement location="test-libs/byte-buddy-1.12.6.jar"/>
-		<pathelement location="test-libs/byte-buddy-agent-1.12.6.jar"/>
-		<pathelement location="test-libs/objenesis-3.2.jar"/>
 		<fileset dir="${jar.dir}" includes="deps/*.jar" />
 		<pathelement location="${dest.dir}"/>
 	</path>

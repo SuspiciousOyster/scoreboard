@@ -14,7 +14,7 @@ import com.carolinarollergirls.scoreboard.utils.Logger;
 
 import io.prometheus.client.Histogram;
 
-public class JSONStateSnapshotter implements JSONStateListener {
+public final class JSONStateSnapshotter implements JSONStateListener {
 
     public JSONStateSnapshotter(JSONStateManager jsm, Game g, boolean useMetrics) {
         this.directory = BasePath.get();

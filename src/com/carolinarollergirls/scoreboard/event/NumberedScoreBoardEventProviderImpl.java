@@ -3,6 +3,7 @@ package com.carolinarollergirls.scoreboard.event;
 import java.util.Objects;
 import java.util.UUID;
 
+@SuppressWarnings("this-escape")
 public abstract class NumberedScoreBoardEventProviderImpl<C extends NumberedScoreBoardEventProvider<C>>
     extends OrderedScoreBoardEventProviderImpl<C> implements NumberedScoreBoardEventProvider<C> {
 

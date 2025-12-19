@@ -18,7 +18,7 @@ import com.carolinarollergirls.scoreboard.event.ValueWithId;
 import com.carolinarollergirls.scoreboard.rules.Rule;
 import com.carolinarollergirls.scoreboard.utils.ScoreBoardClock;
 
-public class PeriodImpl extends NumberedScoreBoardEventProviderImpl<Period> implements Period {
+public final class PeriodImpl extends NumberedScoreBoardEventProviderImpl<Period> implements Period {
     public PeriodImpl(Game g, int p) {
         super(g, p, Game.PERIOD);
         game = g;

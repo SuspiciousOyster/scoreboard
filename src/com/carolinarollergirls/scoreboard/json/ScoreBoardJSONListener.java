@@ -15,7 +15,7 @@ import com.carolinarollergirls.scoreboard.utils.Logger;
 /**
  * Converts a ScoreBoardEvent into a representative JSON Update
  */
-public class ScoreBoardJSONListener implements ScoreBoardListener {
+public final class ScoreBoardJSONListener implements ScoreBoardListener {
     public ScoreBoardJSONListener(ScoreBoard sb, JSONStateManager jsm) {
         this.jsm = jsm;
         process(sb, false);
@@ -103,7 +103,7 @@ public class ScoreBoardJSONListener implements ScoreBoardListener {
         }
     }
 
-    String getPath(ScoreBoardEventProvider p) {
+    private String getPath(ScoreBoardEventProvider p) {
         String path = "";
         if (p.getParent() != null) { path = getPath(p.getParent()) + "."; }
         path = path + p.getProviderName();

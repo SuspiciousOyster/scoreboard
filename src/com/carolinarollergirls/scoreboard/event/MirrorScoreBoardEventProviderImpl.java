@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("this-escape")
 public class MirrorScoreBoardEventProviderImpl<M extends ScoreBoardEventProvider, C
                                                    extends MirrorScoreBoardEventProvider<M>>
     extends ScoreBoardEventProviderImpl<C> implements MirrorScoreBoardEventProvider<M> {

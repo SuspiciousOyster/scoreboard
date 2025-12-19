@@ -19,6 +19,7 @@ import com.carolinarollergirls.scoreboard.rules.RuleDefinition;
 import com.carolinarollergirls.scoreboard.utils.Logger;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
 
+@SuppressWarnings("this-escape")
 public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvider>
     implements ScoreBoardEventProvider, ScoreBoardListener {
     @SuppressWarnings("unchecked")

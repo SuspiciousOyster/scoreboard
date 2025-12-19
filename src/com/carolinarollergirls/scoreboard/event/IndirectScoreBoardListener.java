@@ -1,6 +1,6 @@
 package com.carolinarollergirls.scoreboard.event;
 
-public class IndirectScoreBoardListener<T, U> implements SelfRemovingScoreBoardListener {
+public final class IndirectScoreBoardListener<T, U> implements SelfRemovingScoreBoardListener {
     public IndirectScoreBoardListener(ScoreBoardEventProvider indirectionElement, Value<U> indirectionProperty,
                                       Property<T> watchedProperty, ScoreBoardListener listener) {
         indirectionListener = new ConditionalScoreBoardListener<>(indirectionElement, indirectionProperty, this);

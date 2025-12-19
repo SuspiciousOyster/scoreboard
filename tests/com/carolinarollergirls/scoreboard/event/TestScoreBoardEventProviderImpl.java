@@ -1,6 +1,6 @@
 package com.carolinarollergirls.scoreboard.event;
 
-public class TestScoreBoardEventProviderImpl
+public final class TestScoreBoardEventProviderImpl
     extends ScoreBoardEventProviderImpl<TestScoreBoardEventProvider> implements TestScoreBoardEventProvider {
     public TestScoreBoardEventProviderImpl() {
         super(null, "", null);

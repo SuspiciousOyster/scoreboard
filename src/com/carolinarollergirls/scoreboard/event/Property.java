@@ -2,6 +2,7 @@ package com.carolinarollergirls.scoreboard.event;
 
 import java.util.Collection;
 
+@SuppressWarnings("this-escape")
 public abstract class Property<T> {
     public Property(Class<T> type, String jsonName, Collection<Property<?>> propsToAddTo) {
         this.type = type;

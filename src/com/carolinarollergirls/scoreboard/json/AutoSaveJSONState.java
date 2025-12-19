@@ -22,7 +22,7 @@ import com.carolinarollergirls.scoreboard.utils.Logger;
 
 import io.prometheus.client.Histogram;
 
-public class AutoSaveJSONState implements Runnable {
+public final class AutoSaveJSONState implements Runnable {
 
     public AutoSaveJSONState(JSONStateManager jsm, File dir, boolean useMetrics) {
         this.dir = dir;
@@ -116,8 +116,8 @@ public class AutoSaveJSONState implements Runnable {
         }
     }
 
-    public File getFile(int n) { return getFile(n, dir); }
-    public static File getFile(int n, File dir) {
+    private File getFile(int n) { return getFile(n, dir); }
+    private static File getFile(int n, File dir) {
         return new File(dir, ("scoreboard-" + (n * INTERVAL_SECONDS) + "-secs-ago.json"));
     }
 

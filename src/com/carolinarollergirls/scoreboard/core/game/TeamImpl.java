@@ -40,7 +40,7 @@ import com.carolinarollergirls.scoreboard.rules.Rule;
 import com.carolinarollergirls.scoreboard.utils.ScoreBoardClock;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
 
-public class TeamImpl extends ScoreBoardEventProviderImpl<Team> implements Team {
+public final class TeamImpl extends ScoreBoardEventProviderImpl<Team> implements Team {
     public TeamImpl(Game g, String i) {
         super(g, g.getId() + "_" + i, Game.TEAM);
         game = g;

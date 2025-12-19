@@ -18,7 +18,7 @@ import com.carolinarollergirls.scoreboard.event.Command;
 import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProviderImpl;
 import com.carolinarollergirls.scoreboard.event.Value;
 
-public class OfficialImpl extends ScoreBoardEventProviderImpl<Official> implements Official {
+public final class OfficialImpl extends ScoreBoardEventProviderImpl<Official> implements Official {
     public OfficialImpl(Game g, String id, Child<Official> type) {
         super(g, id, type);
         game = g;

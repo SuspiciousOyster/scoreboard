@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mockito;
 
 import com.carolinarollergirls.scoreboard.core.ScoreBoardImpl;
 import com.carolinarollergirls.scoreboard.core.interfaces.Media;
@@ -29,9 +28,8 @@ import com.carolinarollergirls.scoreboard.utils.BasePath;
 public class MediaImplTests {
 
     // In general Java's macOS implementation takes longer for file system notifications.
-    private static final int secondsToWait = (System.getProperty("os.name").toLowerCase().matches("^mac.*os.*$")
-                                              ? 10 
-                                              : 1);
+    private static final int secondsToWait =
+        (System.getProperty("os.name").toLowerCase().matches("^mac.*os.*$") ? 10 : 1);
 
     private Media media;
     private File init;
@@ -39,7 +37,7 @@ public class MediaImplTests {
     private File oldDir;
 
     private BlockingQueue<ScoreBoardEvent<?>> collectedEvents;
-    private ScoreBoard sbMock;
+    private ScoreBoard sb;
     public ScoreBoardListener listener = new ScoreBoardListener() {
         @Override
         public void scoreBoardChange(ScoreBoardEvent<?> event) {
@@ -54,14 +52,14 @@ public class MediaImplTests {
     public void setUp() throws Exception {
         collectedEvents = new LinkedBlockingQueue<>();
 
-        sbMock = Mockito.mock(ScoreBoardImpl.class);
+        sb = new ScoreBoardImpl(false);
 
         dir.newFolder("html", "images", "teamlogo");
         init = dir.newFile("html/images/teamlogo/init.png");
 
         oldDir = BasePath.get();
         BasePath.set(dir.getRoot());
-        media = new MediaImpl(sbMock);
+        media = new MediaImpl(sb);
         media.addScoreBoardListener(listener);
     }
 
