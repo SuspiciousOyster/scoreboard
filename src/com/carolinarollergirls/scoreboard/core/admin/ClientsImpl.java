@@ -12,7 +12,7 @@ import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.utils.HumanIdGenerator;
 import com.carolinarollergirls.scoreboard.utils.Logger;
 
-public class ClientsImpl extends ScoreBoardEventProviderImpl<Clients> implements Clients {
+public final class ClientsImpl extends ScoreBoardEventProviderImpl<Clients> implements Clients {
     public ClientsImpl(ScoreBoard parent) {
         super(parent, "", ScoreBoard.CLIENTS);
         addProperties(props);
@@ -156,7 +156,7 @@ public class ClientsImpl extends ScoreBoardEventProviderImpl<Clients> implements
         }
     }
 
-    public class DeviceImpl extends ScoreBoardEventProviderImpl<Device> implements Device {
+    public final class DeviceImpl extends ScoreBoardEventProviderImpl<Device> implements Device {
         protected DeviceImpl(Clients parent, String id) {
             super(parent, id, Clients.DEVICE);
             addProperties(props);

@@ -8,6 +8,7 @@ import com.carolinarollergirls.scoreboard.event.Property;
 import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProviderImpl;
 import com.carolinarollergirls.scoreboard.event.Value;
 
+@SuppressWarnings("this-escape")
 public abstract class RuleDefinition extends ScoreBoardEventProviderImpl<RuleDefinition> {
     public RuleDefinition(Type type, String name, String description, Object defaultValue) {
         super(null, name, Rulesets.RULE_DEFINITION);

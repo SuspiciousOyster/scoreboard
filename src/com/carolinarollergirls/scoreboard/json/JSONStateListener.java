@@ -14,7 +14,7 @@ public interface JSONStateListener {
     // in state.
     public void sendUpdates(StateTrie state, StateTrie changed);
 
-    class PathTrie {
+    final class PathTrie {
         boolean isPath = false;
         Map<String, PathTrie> subtries = new HashMap<>();
 
@@ -99,7 +99,7 @@ public interface JSONStateListener {
         }
     }
 
-    class StateTrie implements Cloneable {
+    final class StateTrie implements Cloneable {
         boolean isPath;
         Object value;
         Map<String, StateTrie> subtries = new HashMap<>();

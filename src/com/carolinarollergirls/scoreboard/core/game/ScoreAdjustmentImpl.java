@@ -12,7 +12,7 @@ import com.carolinarollergirls.scoreboard.event.Command;
 import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProviderImpl;
 import com.carolinarollergirls.scoreboard.event.Value;
 
-public class ScoreAdjustmentImpl extends ScoreBoardEventProviderImpl<ScoreAdjustment> implements ScoreAdjustment {
+public final class ScoreAdjustmentImpl extends ScoreBoardEventProviderImpl<ScoreAdjustment> implements ScoreAdjustment {
     public ScoreAdjustmentImpl(Team t, String id) {
         super(t, id, Team.SCORE_ADJUSTMENT);
         game = t.getGame();

@@ -14,7 +14,7 @@ import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProviderImpl;
 import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.utils.ScoreBoardClock;
 
-public class TimeoutImpl extends ScoreBoardEventProviderImpl<Timeout> implements Timeout {
+public final class TimeoutImpl extends ScoreBoardEventProviderImpl<Timeout> implements Timeout {
     public TimeoutImpl(Period p, String id) {
         super(p, id, Period.TIMEOUT);
         game = p.getGame();

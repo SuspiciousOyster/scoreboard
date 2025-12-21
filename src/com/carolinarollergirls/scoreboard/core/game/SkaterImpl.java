@@ -27,7 +27,7 @@ import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.event.ValueWithId;
 import com.carolinarollergirls.scoreboard.rules.Rule;
 
-public class SkaterImpl extends ScoreBoardEventProviderImpl<Skater> implements Skater {
+public final class SkaterImpl extends ScoreBoardEventProviderImpl<Skater> implements Skater {
     public SkaterImpl(Team t, String i) {
         super(t, i == null ? UUID.randomUUID().toString() : i, Team.SKATER);
         team = t;

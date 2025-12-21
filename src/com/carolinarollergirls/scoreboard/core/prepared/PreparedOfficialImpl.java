@@ -6,7 +6,8 @@ import com.carolinarollergirls.scoreboard.core.interfaces.ScoreBoard;
 import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProviderImpl;
 import com.carolinarollergirls.scoreboard.event.Value;
 
-public class PreparedOfficialImpl extends ScoreBoardEventProviderImpl<PreparedOfficial> implements PreparedOfficial {
+public final class PreparedOfficialImpl
+    extends ScoreBoardEventProviderImpl<PreparedOfficial> implements PreparedOfficial {
     public PreparedOfficialImpl(ScoreBoard parent, String id) {
         super(parent, id, ScoreBoard.PREPARED_OFFICIAL);
         addProperties(Official.preparedProps);

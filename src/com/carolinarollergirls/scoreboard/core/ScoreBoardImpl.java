@@ -29,7 +29,7 @@ import com.carolinarollergirls.scoreboard.utils.StatsbookExporter;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
 import com.carolinarollergirls.scoreboard.utils.Version;
 
-public class ScoreBoardImpl extends ScoreBoardEventProviderImpl<ScoreBoard> implements ScoreBoard {
+public final class ScoreBoardImpl extends ScoreBoardEventProviderImpl<ScoreBoard> implements ScoreBoard {
     public ScoreBoardImpl(boolean useMetrics) {
         super(null, "", null);
         this.useMetrics = useMetrics;

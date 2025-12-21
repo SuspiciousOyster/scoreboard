@@ -17,14 +17,11 @@ Packages using the Apache License 2.0 which can be found in COPYING-AL
 Apache POI (poi-*.jar, xmlbeans-3.1.0.jar)
 https://poi.apache.org
 
-Byte Buddy (byte-buddy-*.jar)
-https://bytebuddy.net/
-
 Commons Collections (commons-collections4-*.jar)
 https://commons.apache.org/proper/commons-collections/
 
 Commons Compress (commons-compress-*.jar)
-https://commons.apache.org/proper/commons-collections/
+https://commons.apache.org/proper/commons-compress/
 
 Commons Fileupload (commons-fileupload-*.jar)
 https://commons.apache.org/proper/commons-fileupload/
@@ -40,9 +37,6 @@ https://github.com/FasterXML/jackson
 
 Jetty (jetty-*.jar, servlet-api-*.jar, websocket-*.jar)
 https://www.eclipse.org/jetty/
-
-Objenesis (objenesis-*.jar)
-https://objenesis.org/
 
 Prometheus Java Simpleclient (simpleclient-*.jar)
 https://github.com/prometheus/client_java
@@ -70,6 +64,3 @@ https://hamcrest.org/JavaHamcrest/
 
 Packages using the MIT license available at
 https://github.com/mockito/mockito/blob/main/LICENSE
-
-Mockito (mockito-*.jar)
-https://github.com/mockito/mockito

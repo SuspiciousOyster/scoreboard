@@ -21,7 +21,7 @@ import com.carolinarollergirls.scoreboard.event.ParentOrderedScoreBoardEventProv
 import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.event.ValueWithId;
 
-public class FieldingImpl extends ParentOrderedScoreBoardEventProviderImpl<Fielding> implements Fielding {
+public final class FieldingImpl extends ParentOrderedScoreBoardEventProviderImpl<Fielding> implements Fielding {
     public FieldingImpl(TeamJam teamJam, Position position) {
         super(teamJam, position.getProviderId(), TeamJam.FIELDING);
         addProperties(props);

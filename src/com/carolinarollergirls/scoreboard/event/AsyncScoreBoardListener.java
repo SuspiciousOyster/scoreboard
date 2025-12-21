@@ -3,7 +3,7 @@ package com.carolinarollergirls.scoreboard.event;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class AsyncScoreBoardListener extends Thread implements ScoreBoardListener {
+public final class AsyncScoreBoardListener extends Thread implements ScoreBoardListener {
     public AsyncScoreBoardListener(ScoreBoardListener l) {
         this.listener = l;
         start();

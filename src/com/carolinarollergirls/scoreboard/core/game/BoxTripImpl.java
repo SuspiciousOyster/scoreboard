@@ -26,7 +26,7 @@ import com.carolinarollergirls.scoreboard.event.ValueWithId;
 import com.carolinarollergirls.scoreboard.rules.Rule;
 import com.carolinarollergirls.scoreboard.utils.ScoreBoardClock;
 
-public class BoxTripImpl extends ScoreBoardEventProviderImpl<BoxTrip> implements BoxTrip {
+public final class BoxTripImpl extends ScoreBoardEventProviderImpl<BoxTrip> implements BoxTrip {
     public BoxTripImpl(Game g, String id) {
         super(g, id, Team.BOX_TRIP);
         game = g;

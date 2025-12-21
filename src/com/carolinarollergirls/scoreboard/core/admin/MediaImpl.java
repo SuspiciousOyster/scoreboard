@@ -22,7 +22,7 @@ import com.carolinarollergirls.scoreboard.core.interfaces.ScoreBoard;
 import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProviderImpl;
 import com.carolinarollergirls.scoreboard.utils.BasePath;
 
-public class MediaImpl extends ScoreBoardEventProviderImpl<Media> implements Media {
+public final class MediaImpl extends ScoreBoardEventProviderImpl<Media> implements Media {
     public MediaImpl(ScoreBoard parent) {
         super(parent, "", ScoreBoard.MEDIA);
         addProperties(props);

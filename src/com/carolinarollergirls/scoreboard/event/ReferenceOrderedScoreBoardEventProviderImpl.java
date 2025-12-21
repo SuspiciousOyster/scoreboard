@@ -1,5 +1,6 @@
 package com.carolinarollergirls.scoreboard.event;
 
+@SuppressWarnings("this-escape")
 public abstract class ReferenceOrderedScoreBoardEventProviderImpl<C extends ReferenceOrderedScoreBoardEventProvider<C>>
     extends OrderedScoreBoardEventProviderImpl<C> implements ReferenceOrderedScoreBoardEventProvider<C> {
     protected ReferenceOrderedScoreBoardEventProviderImpl(ScoreBoardEventProvider parent,

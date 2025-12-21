@@ -13,7 +13,7 @@ import com.carolinarollergirls.scoreboard.event.ValueWithId;
 import com.carolinarollergirls.scoreboard.utils.StatsbookExporter;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
 
-public class SettingsImpl extends ScoreBoardEventProviderImpl<Settings> implements Settings {
+public final class SettingsImpl extends ScoreBoardEventProviderImpl<Settings> implements Settings {
     public SettingsImpl(ScoreBoard s) {
         super(s, "", ScoreBoard.SETTINGS);
         addProperties(props);

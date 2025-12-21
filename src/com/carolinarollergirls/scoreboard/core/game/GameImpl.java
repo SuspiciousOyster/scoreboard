@@ -56,7 +56,7 @@ import com.carolinarollergirls.scoreboard.utils.ScoreBoardClock;
 import com.carolinarollergirls.scoreboard.utils.StatsbookExporter;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
 
-public class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game {
+public final class GameImpl extends ScoreBoardEventProviderImpl<Game> implements Game {
     public GameImpl(ScoreBoard sb, PreparedTeam team1, PreparedTeam team2, Ruleset rs) {
         super(sb, UUID.randomUUID().toString(), ScoreBoard.GAME);
         initReferences(rs, null);

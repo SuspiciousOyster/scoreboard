@@ -37,7 +37,7 @@ import com.carolinarollergirls.scoreboard.utils.Logger;
 import com.carolinarollergirls.scoreboard.utils.Version;
 import com.carolinarollergirls.scoreboard.viewer.ScoreBoardMetricsCollector;
 
-public class Main extends Logger {
+public final class Main extends Logger {
     public static void main(String argv[]) { new Main(argv); }
 
     public Main(String argv[]) {
@@ -156,7 +156,7 @@ public class Main extends Logger {
                 System.err.println("Unknown argument: " + arg);
                 System.err.println("Use --help or -h for usage information.");
                 System.exit(1);
-            }            
+            }
         }
 
         if (gui) { createGui(); }

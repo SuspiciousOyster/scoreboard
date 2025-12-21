@@ -41,7 +41,7 @@ public class JettyServletScoreBoardController {
         init(useMetrics);
     }
 
-    protected void init(boolean useMetrics) {
+    private void init(boolean useMetrics) {
         server = new Server();
         ServerConnector sC = new ServerConnector(server);
         sC.setHost(host);

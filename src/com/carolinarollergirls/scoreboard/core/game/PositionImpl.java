@@ -10,7 +10,7 @@ import com.carolinarollergirls.scoreboard.core.interfaces.Team;
 import com.carolinarollergirls.scoreboard.event.Command;
 import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProviderImpl;
 
-public class PositionImpl extends ScoreBoardEventProviderImpl<Position> implements Position {
+public final class PositionImpl extends ScoreBoardEventProviderImpl<Position> implements Position {
     public PositionImpl(Team t, FloorPosition fp) {
         super(t, t.getId() + "_" + fp.toString(), Team.POSITION);
         addProperties(props);

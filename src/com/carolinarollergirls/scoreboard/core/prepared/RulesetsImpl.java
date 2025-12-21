@@ -13,7 +13,7 @@ import com.carolinarollergirls.scoreboard.rules.Rule;
 import com.carolinarollergirls.scoreboard.rules.RuleDefinition;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
 
-public class RulesetsImpl extends ScoreBoardEventProviderImpl<Rulesets> implements Rulesets {
+public final class RulesetsImpl extends ScoreBoardEventProviderImpl<Rulesets> implements Rulesets {
     public RulesetsImpl(ScoreBoard s) {
         super(s, "", ScoreBoard.RULESETS);
         addProperties(props);

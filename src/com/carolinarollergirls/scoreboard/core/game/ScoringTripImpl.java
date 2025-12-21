@@ -9,7 +9,7 @@ import com.carolinarollergirls.scoreboard.event.Command;
 import com.carolinarollergirls.scoreboard.event.NumberedScoreBoardEventProviderImpl;
 import com.carolinarollergirls.scoreboard.event.Value;
 
-public class ScoringTripImpl extends NumberedScoreBoardEventProviderImpl<ScoringTrip> implements ScoringTrip {
+public final class ScoringTripImpl extends NumberedScoreBoardEventProviderImpl<ScoringTrip> implements ScoringTrip {
     ScoringTripImpl(TeamJam parent, int number) {
         super(parent, number, TeamJam.SCORING_TRIP);
         game = parent.getTeam().getGame();

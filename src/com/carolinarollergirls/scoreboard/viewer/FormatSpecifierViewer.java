@@ -25,7 +25,7 @@ import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProvider;
 import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
 
-public class FormatSpecifierViewer {
+public final class FormatSpecifierViewer {
     public FormatSpecifierViewer(ScoreBoard sb) { setScoreBoard(sb); }
 
     public Map<String, String> getFormatSpecifierDescriptions() {
@@ -390,6 +390,7 @@ public class FormatSpecifierViewer {
 
     protected Map<String, ScoreBoardValue<?>> scoreBoardValues = new LinkedHashMap<>();
 
+    @SuppressWarnings("this-escape")
     public abstract class ScoreBoardValue<T> {
         protected ScoreBoardValue(String f, String d, Property<T> prop) {
             format = f;

@@ -39,7 +39,7 @@ import com.carolinarollergirls.scoreboard.event.ScoreBoardListener;
 import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.event.ValueWithId;
 
-public class CurrentGameImpl extends MirrorScoreBoardEventProviderImpl<Game, CurrentGame> implements CurrentGame {
+public final class CurrentGameImpl extends MirrorScoreBoardEventProviderImpl<Game, CurrentGame> implements CurrentGame {
     @SuppressWarnings("unchecked")
     public CurrentGameImpl(ScoreBoard sb) {
         super(sb, "", ScoreBoard.CURRENT_GAME);

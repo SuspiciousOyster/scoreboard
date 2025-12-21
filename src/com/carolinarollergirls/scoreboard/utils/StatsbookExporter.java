@@ -47,7 +47,7 @@ import com.carolinarollergirls.scoreboard.core.interfaces.Team;
 import com.carolinarollergirls.scoreboard.core.interfaces.TeamJam;
 import com.carolinarollergirls.scoreboard.core.interfaces.Timeout;
 
-public class StatsbookExporter extends Thread {
+public final class StatsbookExporter extends Thread {
     public StatsbookExporter(Game g) {
         game = g;
         coreLock = GameImpl.getCoreLock();

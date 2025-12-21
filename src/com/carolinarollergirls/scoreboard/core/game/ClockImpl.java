@@ -17,7 +17,7 @@ import com.carolinarollergirls.scoreboard.rules.Rule;
 import com.carolinarollergirls.scoreboard.utils.ClockConversion;
 import com.carolinarollergirls.scoreboard.utils.ScoreBoardClock;
 
-public class ClockImpl extends ScoreBoardEventProviderImpl<Clock> implements Clock {
+public final class ClockImpl extends ScoreBoardEventProviderImpl<Clock> implements Clock {
     public ClockImpl(BoxTrip bt) {
         super(bt, bt.getId(), BoxTrip.CLOCK);
         game = bt.getGame();

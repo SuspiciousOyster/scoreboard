@@ -32,7 +32,7 @@ import com.carolinarollergirls.scoreboard.event.MirrorFactory;
 import com.carolinarollergirls.scoreboard.event.MirrorScoreBoardEventProvider;
 import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProvider;
 
-public class MirrorFactoryImpl implements MirrorFactory {
+public final class MirrorFactoryImpl implements MirrorFactory {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ScoreBoardEventProvider> MirrorScoreBoardEventProvider<T>

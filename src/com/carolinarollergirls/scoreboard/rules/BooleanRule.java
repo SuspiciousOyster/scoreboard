@@ -1,6 +1,6 @@
 package com.carolinarollergirls.scoreboard.rules;
 
-public class BooleanRule extends RuleDefinition {
+public final class BooleanRule extends RuleDefinition {
     public BooleanRule(String fullname, String description, boolean defaultValue, String trueValue, String falseValue) {
         super(Type.BOOLEAN, fullname, description, Boolean.valueOf(defaultValue));
         addProperties(boolProps);
