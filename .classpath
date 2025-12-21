@@ -6,6 +6,7 @@
 	<classpathentry kind="lib" path="lib/deps/commons-compress-1.28.0.jar"/>
 	<classpathentry kind="lib" path="lib/deps/commons-fileupload-1.6.0.jar"/>
 	<classpathentry kind="lib" path="lib/deps/commons-io-2.21.0.jar"/>
+	<classpathentry kind="lib" path="lib/deps/commons-lang3-3.20.0.jar"/>
 	<classpathentry kind="lib" path="lib/deps/commons-math3-3.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/deps/jackson-core-2.20.1.jar"/>
 	<classpathentry kind="lib" path="lib/deps/jackson-jr-objects-2.20.1.jar"/>
