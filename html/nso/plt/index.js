@@ -2,9 +2,11 @@ WS.AfterLoad(function () {
   _windowFunctions.configureZoom();
   $('body')
     .attr('showTeam', _windowFunctions.getParam('team') || 'both')
-    .attr('sbSheetStyle', _windowFunctions.getParam('pos') || 'plt');
+    .attr('sbSheetStyle', _windowFunctions.getParam('pos') || 'plt')
+    .attr('showNonSkaters', _windowFunctions.checkParam('nonskaters', '1') || null);
 
-  $('#OptionsDialog #OptionZoomable').prop('checked', _windowFunctions.checkParam('zoomable', 1)).button();
+  $('#OptionsDialog #OptionZoomable').toggleClass('sbActive', _windowFunctions.checkParam('zoomable', '1')).button();
+  $('#OptionsDialog #OptionNonSkaters').toggleClass('sbActive', _windowFunctions.checkParam('nonskaters', '1')).button();
   $('#OptionsDialog [team="' + _windowFunctions.getParam('team') + '"]').addClass('sbActive');
   $('#OptionsDialog [pos="' + $('body').attr('sbSheetStyle') + '"]').addClass('sbActive');
   $('#OptionsDialog').dialog({
@@ -73,6 +75,12 @@ function setPos(k, v, elem) {
   $('body').attr('sbSheetStyle', elem.attr('pos'));
   _sbUpdateUrl('pos', elem.attr('pos'));
   updateTitle();
+}
+
+function setNonSkaters(k, v, elem) {
+  elem.toggleClass('sbActive');
+  _sbUpdateUrl('nonskaters', elem.filter('.sbActive').length);
+  $('body').attr('showNonSkaters', elem.hasClass('sbActive') || null);
 }
 
 function setZoom(k, v, elem) {

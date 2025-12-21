@@ -9,7 +9,7 @@
     triggerBatchFunc: function () {
       $('.PltInput>.Team').each(function (i, e) {
         $(e)
-          .find('tr.Skater:not([role="NotInGame"])')
+          .find('tr.Skater:not([role="NotInGame"]), tr.NonSkater:not(.sbHide)')
           .each(function (idx) {
             $(this).toggleClass('Darker', idx % 4 === 2 || idx % 4 === 3);
           });

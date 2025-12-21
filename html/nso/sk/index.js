@@ -2,7 +2,7 @@
   _windowFunctions.configureZoom();
   $('body').attr('showTeam', _windowFunctions.getParam('team'));
 
-  $('#OptionsDialog #OptionZoomable').prop('checked', _windowFunctions.checkParam('zoomable', 1)).button();
+  $('#OptionsDialog #OptionZoomable').prop('checked', _windowFunctions.checkParam('zoomable', '1')).button();
   $('#OptionsDialog [team="' + _windowFunctions.getParam('team') + '"]').addClass('sbActive');
   $('#OptionsDialog').dialog({
     modal: true,

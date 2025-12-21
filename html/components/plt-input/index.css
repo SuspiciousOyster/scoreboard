@@ -19,6 +19,8 @@
 
 .PltInput>.Team .Skater[role="NotInGame"] { display: none; }
 
+body:not([showNonSkaters]) .PltInput>.Team .NonSkater { display: none; }
+
 /* LT part text & colors */
 .PltInput>.Team .Role { background-color: #FFF; } 
 .PltInput>.Team .Darker .Role { background-color: #e7f3ff; } 
@@ -41,7 +43,7 @@
 .PltInput>.Team .Number.OnTrack { background-color: #70ff70; } 
 .PltInput>.Team .Penalty, .PltInput>.Team .Total { background-color: #FFF; } 
 .PltInput>.Team .Darker .Penalty, .PltInput>.Team .Darker .Total { background-color: #FFE8FF; } 
-.PltInput>.Team .Skater [Penalty="0"] { background-color: #ffd0ff; } 
+.PltInput>.Team.Team [Penalty="0"]  { background-color: #ffd0ff; } 
 .PltInput>.Team [warn="1"] .ShowWarn { background-color: #ffff00; } 
 .PltInput>.Team [warn="1"].Darker .ShowWarn { background-color: #e8e800; } 
 .PltInput>.Team [warn="2"] .ShowWarn { background-color: #ff9010; } 

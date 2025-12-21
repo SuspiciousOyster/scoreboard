@@ -35,7 +35,7 @@ const _windowFunctions = {
 
   /* Zoom for mobile views */
   configureZoom: function () {
-    if (!_windowFunctions.checkParam('zoomable', 1)) {
+    if (!_windowFunctions.checkParam('zoomable', '1')) {
       $('head').append('<meta name="viewport" content="width=device-width, user-scalable=no">');
     } else {
       $('head meta[name=viewport]').remove();

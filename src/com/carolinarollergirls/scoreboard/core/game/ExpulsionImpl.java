@@ -20,6 +20,8 @@ public final class ExpulsionImpl extends ScoreBoardEventProviderImpl<Expulsion> 
             .addSource(p, Penalty.JAM_NUMBER)
             .addSource(p, Penalty.PERIOD_NUMBER)
             .addSource(p.getParent(), Skater.ROSTER_NUMBER)
+            .addSource(p.getParent(), Skater.NAME)
+            .addSource(p.getParent(), Skater.FLAGS)
             .addSource(p.getParent().getParent(), Team.DISPLAY_NAME);
         set(INFO, "");
     }
@@ -29,9 +31,12 @@ public final class ExpulsionImpl extends ScoreBoardEventProviderImpl<Expulsion> 
         if (prop == INFO) {
             PenaltyCode code = game.get(Game.PENALTY_CODE, penalty.getCode());
             String penaltyName = code == null ? "Unknown Penalty" : code.getVerbalCues().get(0);
-            value = penalty.getParent().getParent().get(Team.DISPLAY_NAME) + " #" +
-                    penalty.getParent().get(Skater.ROSTER_NUMBER) + " Period " + penalty.getPeriodNumber() + " Jam " +
-                    penalty.getJamNumber() + " for " + penaltyName + ".";
+            value =
+                penalty.getParent().getParent().get(Team.DISPLAY_NAME) +
+                (((Skater) penalty.getParent()).isSkating() ? " #" + penalty.getParent().get(Skater.ROSTER_NUMBER)
+                                                            : " non-skater " + penalty.getParent().get(Skater.NAME)) +
+                " Period " + penalty.getPeriodNumber() + " Jam " + penalty.getJamNumber() + " for " + penaltyName +
+                ".";
         }
         return value;
     }
