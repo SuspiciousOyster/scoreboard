@@ -35,7 +35,7 @@ public interface Game extends ScoreBoardEventProvider {
     public boolean isInJam();
     public Jam getUpcomingJam();
 
-    // update the references to current/upcoming/just ended TeamJams
+    /** update the references to current/upcoming/just ended TeamJams */
     public void updateTeamJams();
 
     public boolean isInOvertime();
@@ -62,17 +62,15 @@ public interface Game extends ScoreBoardEventProvider {
     public Team getTeam(String id);
 
     public void setRuleset(Ruleset rs);
-    // if rs is the current ruleset or an ancestor of it, refresh the current rules
+    /** if rs is the current ruleset or an ancestor of it, refresh the current rules */
     public void refreshRuleset(Ruleset rs);
 
-    // Get information from current ruleset.
     public String get(Rule r);
     public boolean getBoolean(Rule r);
     public int getInt(Rule r);
     public long getLong(Rule r);
     public void set(Rule r, String v);
 
-    // The last loaded ruleset.
     public Ruleset getRuleset();
     public String getRulesetName();
 

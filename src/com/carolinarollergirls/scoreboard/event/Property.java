@@ -2,6 +2,7 @@ package com.carolinarollergirls.scoreboard.event;
 
 import java.util.Collection;
 
+/** The name of a property and the data type associated with it. */
 @SuppressWarnings("this-escape")
 public abstract class Property<T> {
     public Property(Class<T> type, String jsonName, Collection<Property<?>> propsToAddTo) {

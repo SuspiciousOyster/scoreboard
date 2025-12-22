@@ -24,12 +24,10 @@ import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.utils.Logger;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
 
-/**
- * Bulk set ScoreBoard atttributes with JSON paths.
- */
+/** Bulk set ScoreBoard atttributes with JSON paths. */
 public class ScoreBoardJSONSetter {
 
-    // check the version of the incoming update and update if necessary
+    /** check the version of the incoming update and update if necessary */
     public static void updateToCurrentVersion(Map<String, Object> state) {
         String version = (String) state.get("ScoreBoard.Version(release)");
         if (version == null) { version = getVersionFromKeys(state.keySet()); }
@@ -239,7 +237,7 @@ public class ScoreBoardJSONSetter {
         return priorLimit;
     }
 
-    // Make a list of sets to a scoreboard, with JSON paths to fields.
+    /** Convert state to a set of scorebaord updates and send them. */
     public static void set(ScoreBoard sb, Map<String, Object> state, Source source) {
         List<JSONSet> jsl = new ArrayList<>();
         for (String key : state.keySet()) {

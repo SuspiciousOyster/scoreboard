@@ -14,7 +14,7 @@ public interface ScoreBoard extends ScoreBoardEventProvider {
     /** Update state after restoring from autosave */
     public void postAutosaveUpdate();
 
-    // convert the id into a timeoutOwner object
+    /** convert the id into a timeoutOwner object */
     public TimeoutOwner getTimeoutOwner(String id);
 
     public Settings getSettings();

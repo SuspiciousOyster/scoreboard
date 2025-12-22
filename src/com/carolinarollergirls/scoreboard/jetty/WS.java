@@ -42,6 +42,7 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
 
+/** Servlet to handle creating WebSocket connections to web browser clients. */
 public class WS extends WebSocketServlet {
 
     public WS(ScoreBoard s, JSONStateManager j, boolean useMetrics) {

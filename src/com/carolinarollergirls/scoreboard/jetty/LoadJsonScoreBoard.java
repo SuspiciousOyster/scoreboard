@@ -27,6 +27,9 @@ import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProvider.Source;
 import com.carolinarollergirls.scoreboard.json.ScoreBoardJSONSetter;
 import com.carolinarollergirls.scoreboard.utils.StatsbookImporter;
 
+/**
+ * Servlet to handle requests from web browser to upload a JSON or XLSX file.
+ */
 public class LoadJsonScoreBoard extends HttpServlet {
     public LoadJsonScoreBoard(ScoreBoard sb) {
         this.scoreBoard = sb;

@@ -19,8 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
-// import org.mortbay.jetty.*;
 
+/** This Servlet provides the list of URLs of the server for display on the frontend */
 public class UrlsServlet extends HttpServlet {
     public UrlsServlet(Server s) { server = s; }
 
@@ -39,16 +39,14 @@ public class UrlsServlet extends HttpServlet {
             // Try to add.  If for some reason we fail, just ignore this host.
             urls.add((new java.net.URI("http", null, host, port, "/", null, null).toURL()).toString());
         } catch (URISyntaxException uriEx) {
-        } catch (MalformedURLException muE) { }
+        } catch (MalformedURLException muE) {}
     }
 
     protected void addURLs(Set<String> urls, String host, int port) throws MalformedURLException, SocketException {
         if (null == host) {
             for (NetworkInterface iface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
                 for (InetAddress addr : Collections.list(iface.getInetAddresses())) {
-                    if (!addr.isLoopbackAddress()) {
-                        addURL(urls, addr.getHostAddress(), port);
-                    }
+                    if (!addr.isLoopbackAddress()) { addURL(urls, addr.getHostAddress(), port); }
                 }
             }
         } else {
@@ -56,7 +54,7 @@ public class UrlsServlet extends HttpServlet {
             try {
                 // Get the IP address of the given host.
                 addURL(urls, InetAddress.getByName(host).getHostAddress(), port);
-            } catch (UnknownHostException uhE) { }
+            } catch (UnknownHostException uhE) {}
         }
     }
 

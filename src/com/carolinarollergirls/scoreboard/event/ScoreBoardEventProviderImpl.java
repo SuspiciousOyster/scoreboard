@@ -97,8 +97,8 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         dispatch(event);
     }
 
+    /** (Synchronously) send event to listeners. */
     protected void dispatch(ScoreBoardEvent<?> event) {
-        // Synchronously send events to listeners.
         // need to copy the list as some listeners may add or remove listeners
         synchronized (scoreBoardEventListeners) {
             for (ScoreBoardListener l : new ArrayList<>(scoreBoardEventListeners)) { l.scoreBoardChange(event); }
@@ -178,7 +178,12 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         elements.get(providerClass).remove(get(ID));
     }
 
+    /** make a property read only */
     public void addWriteProtection(Property<?> prop) { addWriteProtectionOverride(prop, null); }
+    /**
+     * Make a property read only and mark the given source as exception.
+     * When called multiple times, exceptions are aggregated.
+     */
     public void addWriteProtectionOverride(Property<?> prop, Source override) {
         checkProperty(prop);
         writeProtectionOverride.put(prop, override);
@@ -208,17 +213,17 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         return isWritable(prop, source);
     }
 
-    /**
-     * Make targetProperty a copy of sourceProperty on sourceElement
-     */
+    /**Make targetProperty a copy of sourceProperty on sourceElement */
     protected <T> ScoreBoardListener setCopy(Value<T> targetProperty, ScoreBoardEventProvider sourceElement,
                                              Value<T> sourceProperty, boolean readonly) {
         return setCopy(targetProperty, sourceElement, sourceProperty, readonly, null, READONLY);
     }
+    /** Make targetProperty a copy of sourceProperty on sourceElement, iff guardProperty is true */
     protected <T> ScoreBoardListener setCopy(Value<T> targetProperty, ScoreBoardEventProvider sourceElement,
                                              Value<T> sourceProperty, boolean readonly, Value<Boolean> guardProperty) {
         return setCopy(targetProperty, sourceElement, sourceProperty, readonly, this, guardProperty);
     }
+    /** Make targetProperty a copy of sourceProperty on sourceElement, iff guardProperty on guardElement is true */
     protected <T> ScoreBoardListener setCopy(Value<T> targetProperty, ScoreBoardEventProvider sourceElement,
                                              Value<T> sourceProperty, boolean readonly,
                                              ScoreBoardEventProvider guardElement, Value<Boolean> guardProperty) {
@@ -240,17 +245,20 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         }
         return l;
     }
+    /**Make targetProperty a copy of sourceProperty on sourceElement */
     protected <T extends ValueWithId> ScoreBoardListener setCopy(Child<T> targetProperty,
                                                                  ScoreBoardEventProvider sourceElement,
                                                                  Child<T> sourceProperty, boolean readonly) {
         return setCopy(targetProperty, sourceElement, sourceProperty, readonly, null, READONLY);
     }
+    /** Make targetProperty a copy of sourceProperty on sourceElement, iff guardProperty is true */
     protected <T extends ValueWithId> ScoreBoardListener setCopy(Child<T> targetProperty,
                                                                  ScoreBoardEventProvider sourceElement,
                                                                  Child<T> sourceProperty, boolean readonly,
                                                                  Value<Boolean> guardProperty) {
         return setCopy(targetProperty, sourceElement, sourceProperty, readonly, this, guardProperty);
     }
+    /** Make targetProperty a copy of sourceProperty on sourceElement, iff guardProperty on guardElement is true */
     protected <T extends ValueWithId> ScoreBoardListener setCopy(Child<T> targetProperty,
                                                                  ScoreBoardEventProvider sourceElement,
                                                                  Child<T> sourceProperty, boolean readonly,
@@ -275,16 +283,14 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         return l;
     }
     /**
-     * Make targetProperty a copy of sourceProperty on the element that
-     * indirectionProperty on indirectionElement points to and update the reference
-     * if indirectionProperty changes.
-     *
-     * Example: calling setCopy(Value.CURRENT_JAM_NUMBER, this, Value.CURRENT_JAM,
-     * IValue.NUMBER) in a Period object ensures that Value.CURRENT_PERIOD_NUMBER
-     * always contains the number of the current Jam, whereas calling the above
-     * method setCopy(Value.CURRENT_JAM_NUMBER, get(Value.CURRENT_JAM),
-     * IValue.NUMBER) would attach it to the number of the Jam that was current at
-     * the time of calling.
+     * Make targetProperty a copy of sourceProperty on the element that indirectionProperty on indirectionElement points
+     * to.
+     * <p>
+     * Example: calling setCopy(Value.CURRENT_JAM_NUMBER, this, Value.CURRENT_JAM, IValue.NUMBER) in a Period
+     * object ensures that Value.CURRENT_JAM_NUMBER always contains the number of the current Jam, whereas calling the
+     * above method setCopy(Value.CURRENT_JAM_NUMBER, get(Value.CURRENT_JAM), IValue.NUMBER) would attach it to the
+     * number of the Jam that was current at the time of calling.
+     * </p>
      */
     protected <T, U> ScoreBoardListener setCopy(final Value<T> targetProperty,
                                                 ScoreBoardEventProvider indirectionElement,
@@ -293,6 +299,10 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         return setCopy(targetProperty, indirectionElement, indirectionProperty, sourceProperty, readonly, null,
                        READONLY);
     }
+    /**
+     * Make targetProperty a copy of sourceProperty on the element that indirectionProperty on indirectionElement points
+     * to iff guardProperty is true.
+     */
     protected <T, U> ScoreBoardListener setCopy(final Value<T> targetProperty,
                                                 ScoreBoardEventProvider indirectionElement,
                                                 Value<U> indirectionProperty, final Value<T> sourceProperty,
@@ -300,6 +310,10 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         return setCopy(targetProperty, indirectionElement, indirectionProperty, sourceProperty, readonly, this,
                        guardProperty);
     }
+    /**
+     * Make targetProperty a copy of sourceProperty on the element that indirectionProperty on indirectionElement points
+     * to iff guardProperty on guardElement is true.
+     */
     protected <T, U> ScoreBoardListener setCopy(final Value<T> targetProperty,
                                                 ScoreBoardEventProvider indirectionElement,
                                                 Value<U> indirectionProperty, final Value<T> sourceProperty,
@@ -329,6 +343,10 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         }
         return l;
     }
+    /**
+     * Make targetProperty a copy of sourceProperty on the element that indirectionProperty on indirectionElement
+     * points to.
+     */
     protected <T extends ValueWithId, U> ScoreBoardListener setCopy(final Child<T> targetProperty,
                                                                     ScoreBoardEventProvider indirectionElement,
                                                                     Value<U> indirectionProperty,
@@ -336,6 +354,10 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         return setCopy(targetProperty, indirectionElement, indirectionProperty, sourceProperty, readonly, null,
                        READONLY);
     }
+    /**
+     * Make targetProperty a copy of sourceProperty on the element that indirectionProperty on indirectionElement points
+     * to iff guardProperty is true.
+     */
     protected <T extends ValueWithId, U> ScoreBoardListener setCopy(final Child<T> targetProperty,
                                                                     ScoreBoardEventProvider indirectionElement,
                                                                     Value<U> indirectionProperty,
@@ -344,6 +366,10 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         return setCopy(targetProperty, indirectionElement, indirectionProperty, sourceProperty, readonly, this,
                        guardProperty);
     }
+    /**
+     * Make targetProperty a copy of sourceProperty on the element that indirectionProperty on indirectionElement points
+     * to iff guardProperty on guardElement is true.
+     */
     protected <T extends ValueWithId, U>
         ScoreBoardListener setCopy(final Child<T> targetProperty, ScoreBoardEventProvider indirectionElement,
                                    Value<U> indirectionProperty, final Child<T> sourceProperty, boolean readonly,
@@ -372,10 +398,7 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         }
         return l;
     }
-    /**
-     * recalculate targetProperty whenever one of the sources added to the listener
-     * is changed
-     */
+    /** recalculate targetProperty whenever one of the sources added to the listener is changed */
     protected RecalculateScoreBoardListener<?> setRecalculated(Value<?> targetProperty) {
         checkProperty(targetProperty);
         RecalculateScoreBoardListener<?> l = new RecalculateScoreBoardListener<>(this, targetProperty);
@@ -384,7 +407,7 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
     }
     /**
      * Make sure remoteProperty on the Element(s) pointed to by localProperty points
-     * back to this element
+     * back to this element.
      */
     protected <T> InverseReferenceUpdateListener<T, C> setInverseReference(Property<T> localProperty,
                                                                            Property<C> remoteProperty) {
@@ -476,12 +499,28 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         }
         return computeValue(prop, value, last, source, flag);
     }
+    /**
+     * To be overridden by implementations. Preprocess <code>Value</code> updates.
+     * <p>
+     * This is called before a <code>Value</code> is set from the frontend, a file being parsed or an event listener.
+     * <code>CHANGE</code> flags for Integer or Long values are processed before this.
+     * @return last to cancel the update, the value to be set otherwise.
+     * </p>
+     */
     protected Object computeValue(Value<?> prop, Object value, Object last, Source source, Flag flag) { return value; }
     protected <T> void _valueChanged(Value<T> prop, T value, T last, Source source, Flag flag) {
         if (prop == ID) { elements.get(providerClass).put((String) value, this); }
         scoreBoardChange(new ScoreBoardEvent<>(this, prop, value, last));
         valueChanged(prop, value, last, source, flag);
     }
+    /**
+     * To be overridden by implementations. Postprocess <code>Value</code> updates.
+     * <p>
+     * This is called after a <code>Value</code> is set from the frontend, a file being parsed or an event listener.
+     * It is invoked after all event listeners have finished.
+     * It is not called if the new value is the same as the old value.
+     * </p>
+     */
     protected void valueChanged(Value<?> prop, Object value, Object last, Source source, Flag flag) {}
 
     @SuppressWarnings("unchecked")
@@ -550,6 +589,14 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
             return children.get(prop).size();
         }
     }
+    /**
+     * To be overridden by implementations. Preprocess <code>Child</code> updates.
+     * <p>
+     * This is called before a new <code>Child</code> is added from the frontend, a file being parsed or an event
+     * listener or the value of a child of type <code>ValWithId</code> is changed.
+     * @return false to inhibit the update.
+     * </p>
+     */
     protected <T extends ValueWithId> boolean mayAdd(Child<T> prop, T item, Source source) { return true; }
     @Override
     public <T extends ValueWithId> boolean add(Child<T> prop, T item) {
@@ -590,11 +637,25 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         scoreBoardChange(new ScoreBoardEvent<>(this, prop, item, false));
         itemAdded(prop, item, source);
     }
+    /**
+     * To be overridden by implementations. Postprocess <code>Child</code> updates.
+     * <p>
+     * This is called after a new <code>Child</code> instance has been added or a child of type <code>ValWithId</code>
+     * was updated and after all event listeners have finished.
+     */
     protected void itemAdded(Child<?> prop, ValueWithId item, Source source) {}
     @Override
     public ScoreBoardEventProvider create(Child<? extends ScoreBoardEventProvider> prop, String id, Source source) {
         return null;
     }
+    /**
+     * To be overridden by implementations. Preprocess <code>Child</code> updates.
+     * <p>
+     * This is called before a <code>Child</code> is removed from the frontend, a file being parsed or an event
+     * listener.
+     * @return false to inhibit the update.
+     * </p>
+     */
     protected <T extends ValueWithId> boolean mayRemove(Child<T> prop, T item, Source source) { return true; }
     @Override
     public <T extends ValueWithId> boolean remove(Child<T> prop, String id) {
@@ -656,6 +717,11 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         scoreBoardChange(new ScoreBoardEvent<>(this, prop, item, true));
         itemRemoved(prop, item, source);
     }
+    /**
+     * To be overridden by implementations. Postprocess <code>Child</code> updates.
+     * <p>
+     * This is called after a new <code>Child</code> instance has been removed and after all event listeners have finished.
+     */
     protected void itemRemoved(Child<?> prop, ValueWithId item, Source source) {}
     @Override
     public <T extends ValueWithId> void removeAll(Child<T> prop) {
@@ -709,7 +775,7 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
     }
 
     protected void addProperties(Property<?>... props) { addProperties(Arrays.asList(props)); }
-    protected void addProperties(Collection<Property<?>> props) {
+    protected void addProperties(Collection<Property<?>> props) throws IllegalArgumentException {
         for (Property<?> prop : props) {
             if (properties.containsKey(prop.getJsonName())) {
                 throw new IllegalArgumentException(this.getClass().getName() +

@@ -2,6 +2,7 @@ package com.carolinarollergirls.scoreboard.event;
 
 import java.util.Collection;
 
+/** A property that holds a single value */
 public class Value<T> extends Property<T> {
     public Value(Class<T> type, String jsonName, T defaultValue, Collection<Property<?>> propsToAddTo) {
         super(type, jsonName, propsToAddTo);

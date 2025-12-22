@@ -27,6 +27,10 @@ import org.apache.commons.io.IOUtils;
 
 import com.carolinarollergirls.scoreboard.core.interfaces.ScoreBoard;
 
+/**
+ * Servlet to store/delete media files in the server file system.
+ * (The internal list will be updated separately with an inotify listener.)
+ */
 public class MediaServlet extends HttpServlet {
     public MediaServlet(ScoreBoard sb, String dir) {
         scoreBoard = sb;
