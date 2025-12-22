@@ -359,6 +359,11 @@ public final class SkaterImpl extends ScoreBoardEventProviderImpl<Skater> implem
     public void setFlags(String f) {
         set(FLAGS, f);
     }
+    @Override
+    public boolean isSkating() {
+        String flags = getFlags();
+        return "".equals(flags) || "C".equals(flags) || "A".equals(flags);
+    }
 
     @Override
     public BoxTrip getCurrentBoxTrip() {

@@ -37,6 +37,7 @@ public interface Skater extends ScoreBoardEventProvider {
     public void setPenaltyBox(boolean box);
     public String getFlags();
     public void setFlags(String flags);
+    public boolean isSkating();
     public BoxTrip getCurrentBoxTrip();
     public Penalty getPenalty(String num);
     public List<Penalty> getUnservedPenalties();

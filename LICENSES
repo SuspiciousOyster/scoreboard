@@ -1,5 +1,5 @@
 Copyright (C) 2008-2012 Mr Temper <MrTemper@CarolinaRollergirls.com>
-Copyright (C) 2012-2022 The CRG developers
+Copyright (C) 2012-2025 The CRG developers
 
 This file is part of the CRG ScoreBoard.
 The CRG ScoreBoard is licensed under either the GNU General Public
@@ -32,6 +32,9 @@ https://commons.apache.org/proper/commons-io/
 Commons Math (commons-math3-*.jar)
 https://commons.apache.org/proper/commons-math/
 
+Commons Lang (commons-lang3-*.jar)
+https://commons.apache.org/proper/commons-lang/
+
 Jackson (jackson-*.jar)
 https://github.com/FasterXML/jackson
 
@@ -58,9 +61,3 @@ https://opensource.org/licenses/BSD-3-Clause
 
 Hamcrest (hamcrest-*.jar)
 https://hamcrest.org/JavaHamcrest/
-
-
-
-
-Packages using the MIT license available at
-https://github.com/mockito/mockito/blob/main/LICENSE
