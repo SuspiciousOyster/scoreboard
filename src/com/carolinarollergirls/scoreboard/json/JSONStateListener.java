@@ -9,9 +9,12 @@ import java.util.Set;
 import java.util.TreeMap;
 
 public interface JSONStateListener {
-    // A snapshot of the current state, and which keys it it have changed.
-    // Keys with a value of null are considered deleted, and will not be present
-    // in state.
+    /**
+     * A snapshot of the current state, and which keys in it have changed.
+     * <p>
+     * Keys with a value of null are considered deleted, and will only be present in changed, not in state.
+     * </p>
+     */
     public void sendUpdates(StateTrie state, StateTrie changed);
 
     final class PathTrie {

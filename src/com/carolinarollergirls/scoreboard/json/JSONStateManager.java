@@ -86,7 +86,7 @@ public class JSONStateManager {
 
     public Map<String, Object> getState() { return state.getAll(false); }
 
-    // For unittests.
+    /** Wait for all pending updates to be sent out. This is intended for unit tests. */
     protected void waitForSent() {
         while (pending.get() > 0) {
             try {

@@ -28,7 +28,7 @@ import javax.swing.JTextArea;
 
 import com.carolinarollergirls.scoreboard.core.ScoreBoardImpl;
 import com.carolinarollergirls.scoreboard.core.interfaces.ScoreBoard;
-import com.carolinarollergirls.scoreboard.jetty.JettyServletScoreBoardController;
+import com.carolinarollergirls.scoreboard.jetty.ScoreBoardWebserver;
 import com.carolinarollergirls.scoreboard.json.AutoSaveJSONState;
 import com.carolinarollergirls.scoreboard.json.JSONStateManager;
 import com.carolinarollergirls.scoreboard.json.ScoreBoardJSONListener;
@@ -64,8 +64,7 @@ public final class Main extends Logger {
         new ScoreBoardJSONListener(scoreBoard, jsm);
 
         // Controllers.
-        JettyServletScoreBoardController jetty =
-            new JettyServletScoreBoardController(scoreBoard, jsm, host, port, useMetrics);
+        ScoreBoardWebserver jetty = new ScoreBoardWebserver(scoreBoard, jsm, host, port, useMetrics);
 
         // Viewers.
         if (useMetrics) { new ScoreBoardMetricsCollector(scoreBoard).register(); }

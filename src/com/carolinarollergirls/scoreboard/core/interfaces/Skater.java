@@ -45,8 +45,10 @@ public interface Skater extends ScoreBoardEventProvider {
     public long getExtraPenaltyTime();
     public void mergeInto(PreparedSkater preparedSkater);
 
+    /** Properties exclusive to Skater */
     public static Collection<Property<?>> props = new ArrayList<>();
-    public static Collection<Property<?>> preparedProps = new ArrayList<>(); // also present on PreparedTeam.Skater
+    /** Properties also present on PreparedTeam.Skater */
+    public static Collection<Property<?>> preparedProps = new ArrayList<>();
 
     public static final Value<PreparedSkater> PREPARED_SKATER =
         new Value<>(PreparedSkater.class, "PreparedSkater", null, props);

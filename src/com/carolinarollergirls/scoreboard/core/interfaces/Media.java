@@ -11,7 +11,7 @@ import com.carolinarollergirls.scoreboard.event.Value;
 public interface Media extends ScoreBoardEventProvider {
     public MediaFormat getFormat(String format);
 
-    // Deletes a file off disk. True if successful.
+    /** @return True if successful. */
     public boolean removeMediaFile(String format, String type, String id);
 
     public boolean validFileName(String fn);

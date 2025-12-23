@@ -51,8 +51,10 @@ public abstract class RuleDefinition extends ScoreBoardEventProviderImpl<RuleDef
         String string;
     }
 
+    /** Properties used on all types of rule */
     public static Collection<Property<?>> props = new ArrayList<>();
-    public static Collection<Property<?>> boolProps = new ArrayList<>(); // props only used on BooleanRule
+    /** Properties only used on BooleanRule */
+    public static Collection<Property<?>> boolProps = new ArrayList<>();
 
     public static final Value<String> NAME = new Value<>(String.class, "Name", "", props);
     public static final Value<Type> TYPE = new Value<>(Type.class, "Type", null, props);

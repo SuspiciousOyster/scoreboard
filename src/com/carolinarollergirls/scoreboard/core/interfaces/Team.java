@@ -10,7 +10,7 @@ import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProvider;
 import com.carolinarollergirls.scoreboard.event.Value;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
 
-// Managemnt of currently playing teams.
+/** Managemnt of currently playing teams. */
 public interface Team extends ScoreBoardEventProvider, TimeoutOwner {
     public Game getGame();
 
@@ -87,8 +87,10 @@ public interface Team extends ScoreBoardEventProvider, TimeoutOwner {
     public static final String OPTION_LEAGUE_NAME = "League";
     public static final String OPTION_FULL_NAME = "Full";
 
+    /** Properties exclusive to Team */
     public static Collection<Property<?>> props = new ArrayList<>();
-    public static Collection<Property<?>> preparedProps = new ArrayList<>(); // also present on PreparedTeam
+    /** Properties also present on PreparedTeam */
+    public static Collection<Property<?>> preparedProps = new ArrayList<>();
 
     public static final Value<String> DISPLAY_NAME = new Value<>(String.class, "Name", "", preparedProps);
     public static final Value<String> FULL_NAME = new Value<>(String.class, "FullName", "", preparedProps);

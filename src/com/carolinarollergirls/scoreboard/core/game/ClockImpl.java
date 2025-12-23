@@ -216,10 +216,15 @@ public final class ClockImpl extends ScoreBoardEventProviderImpl<Clock> implemen
     public void resetTime() {
         set(TIME, getTime(), Flag.RESET);
     }
+    /**
+     *  @return true, if going from last to current changes the displayed clock value on the frontend
+     * <p>
+     * The frontend rounds values that are not full seconds to the earlier second
+     * i.e. 3600ms will be displayed as 3s on a count up clock and as 4s on a count
+     * down clock.
+     * </p>
+     */
     protected boolean isDisplayChange(long current, long last) {
-        // the frontend rounds values that are not full seconds to the earlier second
-        // i.e. 3600ms will be displayed as 3s on a count up clock and as 4s on a count
-        // down clock.
         if (isCountDirectionDown()) {
             return floorDiv(current - 1, 1000) != floorDiv(last - 1, 1000);
         } else {

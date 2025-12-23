@@ -27,7 +27,7 @@ public interface Clients extends ScoreBoardEventProvider {
     public Client addClient(String deviceId, String remoteAddr, String source, String platform);
     public void removeClient(Client c);
 
-    // An active websocket client.
+    /** An active websocket client. */
     public static interface Client extends ScoreBoardEventProvider {
         public void write();
 
@@ -41,7 +41,7 @@ public interface Clients extends ScoreBoardEventProvider {
         public static final Value<Long> WROTE = new Value<>(Long.class, "Wrote", 0L, props);
     }
 
-    // A device is a HTTP cookie.
+    /** A device is a HTTP cookie. */
     public static interface Device extends ScoreBoardEventProvider {
         public String getName();
 

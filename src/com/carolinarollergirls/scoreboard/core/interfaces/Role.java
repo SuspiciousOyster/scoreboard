@@ -1,5 +1,6 @@
 package com.carolinarollergirls.scoreboard.core.interfaces;
 
+/** Role of a skater in a jam */
 public enum Role {
     NOT_IN_GAME("NotInGame"),
     INELIGIBLE("Ineligible"),

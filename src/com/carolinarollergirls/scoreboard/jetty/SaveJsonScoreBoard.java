@@ -15,6 +15,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
 
 import com.carolinarollergirls.scoreboard.json.JSONStateManager;
 
+/** Servlet to provide JSON exports of selected data. */
 public class SaveJsonScoreBoard extends HttpServlet {
 
     public SaveJsonScoreBoard(JSONStateManager jsm) { this.jsm = jsm; }

@@ -30,9 +30,11 @@ import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.filter.MetricsFilter;
 import io.prometheus.client.hotspot.DefaultExports;
 
-public class JettyServletScoreBoardController {
-    public JettyServletScoreBoardController(ScoreBoard sb, JSONStateManager jsm, String host, int port,
-                                            boolean useMetrics) {
+/**
+ * Set up and start the Webserver
+ */
+public class ScoreBoardWebserver {
+    public ScoreBoardWebserver(ScoreBoard sb, JSONStateManager jsm, String host, int port, boolean useMetrics) {
         scoreBoard = sb;
         this.jsm = jsm;
         this.host = host;

@@ -22,6 +22,14 @@ import com.carolinarollergirls.scoreboard.core.interfaces.ScoreBoard;
 import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProviderImpl;
 import com.carolinarollergirls.scoreboard.utils.BasePath;
 
+/**
+ * Maintain list of media files and provide notifications when list changes.
+ * <p>
+ * Logically, a media item is identified by the tuple (format, type,
+ * filename). The file system path for each file is
+ * <code>BasePath/html/format/type/filename</code>.
+ * </p>
+ */
 public final class MediaImpl extends ScoreBoardEventProviderImpl<Media> implements Media {
     public MediaImpl(ScoreBoard parent) {
         super(parent, "", ScoreBoard.MEDIA);
@@ -47,7 +55,7 @@ public final class MediaImpl extends ScoreBoardEventProviderImpl<Media> implemen
                     Path p = path.resolve(format).resolve(type);
                     p.toFile().mkdirs();
                     p.register(watchService, ENTRY_CREATE, ENTRY_DELETE, OVERFLOW);
-                    mediaTypeRefresh(format, type);
+                    checkForAddedOrRemovedFiles(format, type);
                 }
             }
         } catch (Exception e) {
@@ -74,7 +82,7 @@ public final class MediaImpl extends ScoreBoardEventProviderImpl<Media> implemen
                             for (WatchEvent<?> event : key.pollEvents()) {
                                 WatchEvent.Kind<?> kind = event.kind();
                                 if (kind == OVERFLOW) {
-                                    mediaTypeRefresh(format, type);
+                                    checkForAddedOrRemovedFiles(format, type);
                                     continue;
                                 }
                                 Path filename = (Path) event.context();
@@ -93,7 +101,7 @@ public final class MediaImpl extends ScoreBoardEventProviderImpl<Media> implemen
         thread.start();
     }
 
-    private void mediaTypeRefresh(String format, String type) {
+    private void checkForAddedOrRemovedFiles(String format, String type) {
         synchronized (coreLock) {
             Path p = path.resolve(format).resolve(type);
             Collection<MediaFile> files = getFormat(format).getType(type).getAll(MediaType.FILE);
