@@ -466,6 +466,9 @@ public final class TeamImpl extends ScoreBoardEventProviderImpl<Team> implements
             if (s.getId() != getId()) { return; }
             set(FIELDING_ADVANCE_PENDING, s.getFieldingAdvancePending());
             updateTeamJams();
+            recountTimeouts();
+            set(LOST, s.getLost());
+            set(LEAD, s.getLead());
             if (game.isInJam()) {
                 set(CALLOFF, false);
                 set(INJURY, false);
@@ -986,6 +989,8 @@ public final class TeamImpl extends ScoreBoardEventProviderImpl<Team> implements
         private TeamSnapshotImpl(Team team) {
             id = team.getId();
             fieldingAdvancePending = team.hasFieldingAdvancePending();
+            lost = team.isLost();
+            lead = team.isLead();
         }
 
         @Override
@@ -998,7 +1003,19 @@ public final class TeamImpl extends ScoreBoardEventProviderImpl<Team> implements
             return fieldingAdvancePending;
         }
 
+        @Override
+        public boolean getLost() {
+            return lost;
+        }
+
+        @Override
+        public boolean getLead() {
+            return lead;
+        }
+
         protected String id;
         protected boolean fieldingAdvancePending;
+        protected boolean lost;
+        protected boolean lead;
     }
 }

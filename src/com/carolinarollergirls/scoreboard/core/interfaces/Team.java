@@ -177,5 +177,7 @@ public interface Team extends ScoreBoardEventProvider, TimeoutOwner {
     public static interface TeamSnapshot {
         public String getId();
         public boolean getFieldingAdvancePending();
+        public boolean getLost();
+        public boolean getLead();
     }
 }
