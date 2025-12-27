@@ -79,6 +79,7 @@ public interface Clock extends ScoreBoardEventProvider {
         public String getId();
         public String getName();
         public int getNumber();
+        public long getMaximumTime();
         public long getTime();
         public boolean isRunning();
     }

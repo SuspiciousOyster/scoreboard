@@ -427,6 +427,11 @@ public final class BoxTripImpl extends ScoreBoardEventProviderImpl<BoxTrip> impl
     @Override
     public void startJam() {
         if (getClock() != null && !get(TIMING_STOPPED)) {
+            if (delayedStartTime != 0L && ScoreBoardClock.getInstance().getCurrentTime() < delayedStartTime) {
+                // jam started while playing back time before penalty started - adjust clock to keep end at correct time
+                extraRevertedTime = delayedStartTime - ScoreBoardClock.getInstance().getCurrentTime();
+                getClock().changeMaximumTime(extraRevertedTime);
+            }
             getClock().start();
             if (getClock().isTimeAtEnd() && getEndFielding() == null) { end(); }
         }
@@ -438,8 +443,15 @@ public final class BoxTripImpl extends ScoreBoardEventProviderImpl<BoxTrip> impl
 
     @Override
     public void stopJam() {
-        if (getClock() != null) { getClock().stop(); }
-        if (storedClock != null) { storedClock.stop(); }
+        Clock clock = storedClock != null ? storedClock : getClock();
+        if (clock != null) {
+            clock.stop();
+            if (delayedStartTime != 0L && ScoreBoardClock.getInstance().getCurrentTime() < delayedStartTime) {
+                // jam ended while playing back time before penalty has started - undo clock adjustment
+                clock.changeMaximumTime(-extraRevertedTime);
+                clock.resetTime();
+            }
+        }
     }
 
     @Override
@@ -503,8 +515,18 @@ public final class BoxTripImpl extends ScoreBoardEventProviderImpl<BoxTrip> impl
                 getClock().restoreSnapshot(s);
             } else {
                 // Box Trip was started during reverted time
+                if (delayedStartTime == 0L) {
+                    extraRevertedTime = ScoreBoardClock.getInstance().getLastRewind() - getClock().getTimeElapsed();
+                }
+                delayedStartTime = ScoreBoardClock.getInstance().getCurrentTime() + extraRevertedTime;
+                getClock().stop();
                 getClock().resetTime();
-                getClock().set(Clock.RUNNING, game.isInJam());
+                if (game.isInJam()) {
+                    // we are starting the clock earlier than it was initially started - add that extra time, so the
+                    // end time remains where it should
+                    getClock().changeMaximumTime(extraRevertedTime);
+                    getClock().start();
+                }
             }
         }
     }
@@ -514,4 +536,6 @@ public final class BoxTripImpl extends ScoreBoardEventProviderImpl<BoxTrip> impl
     private boolean initialTimeAdjusted = false;
     private Penalty penaltyAdded = null;
     private long extraTimeAdded = 0L;
+    private long extraRevertedTime = 0L;
+    private long delayedStartTime = 0L;
 }

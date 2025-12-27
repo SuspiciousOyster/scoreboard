@@ -158,6 +158,7 @@ public final class ClockImpl extends ScoreBoardEventProviderImpl<Clock> implemen
             setName(s.getName());
             setNumber(s.getNumber());
             stop();
+            if (!isPenaltyClock) { set(MAXIMUM_TIME, s.getMaximumTime()); }
             set(TIME, isCountDirectionDown() ? getMaximumTime() - s.getTime() : s.getTime(), Flag.SPECIAL_CASE);
             if (s.isRunning()) { start(); }
         }
@@ -355,6 +356,7 @@ public final class ClockImpl extends ScoreBoardEventProviderImpl<Clock> implemen
             id = clock.getId();
             name = clock.getName();
             number = clock.getNumber();
+            maximumTime = clock.getMaximumTime();
             time = clock.getTimeElapsed();
             isRunning = clock.isRunning();
         }
@@ -376,6 +378,10 @@ public final class ClockImpl extends ScoreBoardEventProviderImpl<Clock> implemen
             return time;
         }
         @Override
+        public long getMaximumTime() {
+            return maximumTime;
+        }
+        @Override
         public boolean isRunning() {
             return isRunning;
         }
@@ -383,6 +389,7 @@ public final class ClockImpl extends ScoreBoardEventProviderImpl<Clock> implemen
         protected String id;
         protected String name;
         protected int number;
+        protected long maximumTime;
         protected long time;
         protected boolean isRunning;
     }
