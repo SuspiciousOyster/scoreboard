@@ -286,8 +286,14 @@ var WS = {
             elem.css(options.css, v == null ? '' : v);
           };
         } else if (options.attr != null) {
-          callback = function (k, v) {
+          callback = function (k, v, elem) {
             elem.attr(options.attr, v);
+            if (elem.prop('tagName') === 'OPTION' && options.attr === 'value') {
+              const cached = WS._selectCache.get(elem.parent()[0]);
+              if (cached) {
+                cached.callback(WS._enrichProp(cached.path), WS.state[cached.path], elem.parent());
+              }
+            }
           };
         } else if (options.prop != null) {
           callback = function (k, v) {

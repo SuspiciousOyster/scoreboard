@@ -235,6 +235,16 @@
             </select>
             <button class="Swap" sbToggle="Swap">Swap</button>
           </span>
+          <span sbClass="sbHide: Role: igrfIsNotPackRef">
+            <br /><select sbControl="CurrentPosition">
+              <option value=""></option>
+              <option sbClass="sbHide: Role: === 'Outside Pack Referee'" sbAttr="value: -: k.Game + '_IPRR'">IPR Rear</option>
+              <option sbClass="sbHide: Role: === 'Outside Pack Referee'" sbAttr="value: -: k.Game + '_IPRF'">IPR Front</option>
+              <option sbClass="sbHide: Role: === 'Inside Pack Referee'" sbAttr="value: -: k.Game + '_OPRR'">OPR Rear</option>
+              <option sbClass="sbHide: Role: === 'Inside Pack Referee'" sbAttr="value: -: k.Game + '_OPRM'">OPR Middle</option>
+              <option sbClass="sbHide: Role: === 'Inside Pack Referee'" sbAttr="value: -: k.Game + '_OPRF'">OPR Front</option>
+            </select>
+          </span>
         </td>
         <td colspan="2" class="Prepared" sbClass="sbHide: PreparedOfficial: sbIsEmpty">
           <span sbDisplay="Name"></span> (<span sbDisplay="League"></span> - <span sbDisplay="Cert"></span>)

@@ -25,6 +25,7 @@ import com.carolinarollergirls.scoreboard.core.interfaces.Jam;
 import com.carolinarollergirls.scoreboard.core.interfaces.Media.MediaFile;
 import com.carolinarollergirls.scoreboard.core.interfaces.Media.MediaType;
 import com.carolinarollergirls.scoreboard.core.interfaces.Official;
+import com.carolinarollergirls.scoreboard.core.interfaces.OfficialPosition;
 import com.carolinarollergirls.scoreboard.core.interfaces.Penalty;
 import com.carolinarollergirls.scoreboard.core.interfaces.Period;
 import com.carolinarollergirls.scoreboard.core.interfaces.Period.PeriodSnapshot;
@@ -109,6 +110,15 @@ public final class GameImpl extends ScoreBoardEventProviderImpl<Game> implements
         add(CLOCK, new ClockImpl(this, Clock.ID_LINEUP));
         add(CLOCK, new ClockImpl(this, Clock.ID_TIMEOUT));
         add(CLOCK, new ClockImpl(this, Clock.ID_INTERMISSION));
+        getOfficialPosition("IPRF");
+        getOfficialPosition("IPRR");
+        getOfficialPosition("JR1");
+        getOfficialPosition("JR2");
+        getOfficialPosition("OPRF");
+        getOfficialPosition("OPRM");
+        getOfficialPosition("OPRR");
+        getOfficialPosition("PBM");
+        getOfficialPosition("JT");
         addWriteProtection(CLOCK);
         addWriteProtectionOverride(EXPULSION, Source.NON_WS);
         addWriteProtectionOverride(IN_JAM, Source.NON_WS);
@@ -564,6 +574,7 @@ public final class GameImpl extends ScoreBoardEventProviderImpl<Game> implements
             if (prop == Team.BOX_TRIP) { return new BoxTripImpl(this, id); }
             if (prop == NSO) { return new OfficialImpl(this, id, NSO); }
             if (prop == REF) { return new OfficialImpl(this, id, REF); }
+            if (prop == OFFICIAL_POSITION) { return new OfficialPositionImpl(this, id); }
             if (prop == EXPULSION && source.isFile()) {
                 if (elements.get(Penalty.class) == null) { return null; }
                 Penalty p = (Penalty) elements.get(Penalty.class).get(id);
@@ -1206,6 +1217,11 @@ public final class GameImpl extends ScoreBoardEventProviderImpl<Game> implements
     public void clearStatsbookError() {
         exportFailureText = "";
         set(EXPORT_BLOCKED_BY, "");
+    }
+
+    @Override
+    public OfficialPosition getOfficialPosition(String id) {
+        return getOrCreate(OFFICIAL_POSITION, id);
     }
 
     public static void setQuickClockThreshold(long threshold) { quickClockThreshold = threshold; } // for unit tests

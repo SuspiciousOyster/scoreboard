@@ -170,6 +170,10 @@ function igrfIsNotPerTeam(k, v) {
   return ['Penalty Lineup Tracker', 'Scorekeeper', 'Lineup Tracker', 'Jammer Referee', 'Penalty Box Timer'].indexOf(v) == -1;
 }
 
+function igrfIsNotPackRef(k, v) {
+  return !v.endsWith('Pack Referee') && v !== 'Head Referee';
+}
+
 function igrfOpenRemoveDialog(k) {
   WS.SetupDialog($('#OfficialRemoveDialog'), k, {
     title: 'Remove Official',

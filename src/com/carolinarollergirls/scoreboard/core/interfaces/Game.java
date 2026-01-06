@@ -79,6 +79,8 @@ public interface Game extends ScoreBoardEventProvider {
     public void exportDone(boolean success, String failureText);
     public void clearStatsbookError();
 
+    public OfficialPosition getOfficialPosition(String id);
+
     public enum State {
         PREPARED("Prepared"),
         RUNNING("Running"),
@@ -150,6 +152,8 @@ public interface Game extends ScoreBoardEventProvider {
     public static final Child<ValWithId> EVENT_INFO = new Child<>(ValWithId.class, "EventInfo", props);
     public static final Child<Official> NSO = new Child<>(Official.class, "Nso", props);
     public static final Child<Official> REF = new Child<>(Official.class, "Ref", props);
+    public static final Child<OfficialPosition> OFFICIAL_POSITION =
+        new Child<>(OfficialPosition.class, "OfficialPosition", props);
     public static final Child<Expulsion> EXPULSION = new Child<>(Expulsion.class, "Expulsion", props);
 
     public static final NumberedChild<Period> PERIOD = new NumberedChild<>(Period.class, "Period", props);

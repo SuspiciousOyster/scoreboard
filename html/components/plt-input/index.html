@@ -69,7 +69,7 @@
             class="Penalty sbShowOnPt ShowWarn"
             sbDisplay="Code: sbToNbspIfEmpty"
             sbAttr="period: PeriodNumber | jam: JamNumber"
-            sbClass="Serving: Serving | Unserved: Served: sbIsSetAndFalse"
+            sbClass="Serving: Serving | Unserved: Served: sbIsSetAndFalse | sbHasAnnotation: Annotation: sbIsNotEmpty"
             sbCall="pltEditPenalty"
           >
             &nbsp;
@@ -86,7 +86,7 @@
             class="Penalty sbShowOnPt ShowWarn"
             sbDisplay="PeriodNumber,JamNumber: pltToPeriodJam"
             sbAttr="period: PeriodNumber | jam: JamNumber"
-            sbClass="Serving: Serving | Unserved: Served: sbIsSetAndFalse"
+            sbClass="Serving: Serving | Unserved: Served: sbIsSetAndFalse | Set: Code: sbIsNotEmpty | NoOfficial: CallingPosition: sbIsEmpty"
             sbCall="pltEditPenalty"
           >
             &nbsp;
@@ -200,7 +200,7 @@
     </div>
   </div>
   <div id="PenaltyEditor" sbContext="Skater(*).Penalty(*)">
-    <div class="sbSegment" sbPrefix="p:[*]">
+    <div class="sbSegment" class="Main" sbPrefix="p:[*]">
       <div class="sbGroup" sbContext="^^^">
         <span>
           <span>
@@ -259,9 +259,29 @@
           sbCall="sbCloseDialog"
         ></div>
       </div>
+      <div class="sbGroup">Comment: <input type="text" size="40" sbControl="Annotation" /></div>
       <div class="sbGroup">
         <button sbClass="sbActive: Served" sbSet="ForceServed: !elem.hasClass('sbActive')">Served</button>
         <button sbSet="Remove" sbCall="sbCloseDialog">Delete</button>
+      </div>
+    </div>
+    <div class="sbSegment CalledBy" sbPrefix="p:[*]">
+      <div class="sbGroup sbSubHeader">Called By <button class="sbNoDistract" sbCall="pltToggleReassign">Edit Pos</button></div>
+      <div
+        class="sbGroup sbStack OfficialPosition"
+        sbContext="^^^"
+        sbForeach="OfficialPosition:IPRR,IPRF,JR1,JR2,OPRF,OPRM,OPRR,PBM,JT"
+        sbClass="HasOfficial: CurrentOfficial: sbIsNotEmpty | sbActive: p.CallingPosition: == k.Game + '_' + elem.attr('OfficialPosition')"
+        sbSet="p.CallingPosition: k.Game + '_' + elem.attr('OfficialPosition')"
+      >
+        <span sbDisplay="Name"></span>
+        <span class="OnNoEdit" sbDisplay="CurrentOfficialName"></span>
+        <select class="OnEdit" sbControl="CurrentOfficial">
+          <option value=""></option>
+          <option sbContext="^" sbForeach="Ref" sbAttr="value: Id" sbDisplay="Name" sbClass="Filter: CurrentPosition: sbIsNotEmpty"></option>
+          <option sbContext="^" sbForeach="Nso" sbAttr="value: Id" sbDisplay="Name" sbClass="Filter: CurrentPosition: sbIsNotEmpty"></option>
+        </select>
+        <button class="OnEdit" sbClass="sbHide: Removable: !" sbSet="Remove">Remove Position</button>
       </div>
     </div>
   </div>

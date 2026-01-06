@@ -182,7 +182,7 @@ function _pltOpenPenaltyEditor(g, t, s, p) {
   WS.SetupDialog($('#PenaltyEditor'), prefix + '.Penalty(' + p + ')', {
     modal: true,
     title: teamName + ' ' + skaterNumber + ' (' + skaterName + ')',
-    width: '80%',
+    width: Math.min(1200, 0.9 * window.innerWidth),
   });
 }
 
@@ -235,7 +235,18 @@ function pltToPenaltyCodeDisplay(k, v, elem, suffix) {
 }
 
 function pltToExpCodeDisplay(k, v, elem) {
-  return pltToPenaltyCodeDisplay(k, v, elem, '(EXP)');
+  return pltToPenaltyCodeDisplay(k, v, elem, ' (EXP)');
+}
+
+function pltToggleReassign(k, v, elem) {
+  elem.closest('.CalledBy').toggleClass('Reassign');
+  elem.toggleClass('sbActive', elem.closest('.CalledBy').hasClass('Reassign'));
+}
+
+function pltFilterOfficial(k, v, elem) {
+  const targetPosition = elem.parent().parent().attr('OfficialPosition');
+  const officialsPosition = v.match(/\p{Lu}/gu).join();
+  return targetPosition.startsWith(officialsPosition);
 }
 
 //###################################################################

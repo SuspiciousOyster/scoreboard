@@ -393,7 +393,7 @@ public final class StatsbookExporter extends Thread {
             int col = num == 0 ? 10 : num;
             if (period == 2) { col += 28; }
             if (Team.ID_2.equals(s.getTeam().getProviderId())) { col += 15; }
-            setCell(penRow, col, p.get(Penalty.CODE));
+            setCell(penRow, col, p.get(Penalty.CODE), p.get(Penalty.ANNOTATION));
             setCell(jamRow, col, p.getJamNumber());
         }
     }
