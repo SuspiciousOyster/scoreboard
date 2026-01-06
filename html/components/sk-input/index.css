@@ -1,7 +1,10 @@
 /* mirror team 2 */
-body:not([showTeam="2"]) [Team] ~ [Team]>.SkInput>.sbGroup:not(.sbStack)  { flex-direction: row-reverse; }
-body:not([showTeam="2"]) [Team] ~ [Team]>.SkInput .ScoreRow  { flex-direction: row-reverse; }
-body:not([showTeam="2"]) [Team] ~ [Team]>.SkInput .Timeouts > span  { flex-direction: row-reverse; }
+body:not([showTeam="2"]):not([swapTeams]) [Team] ~ [Team]>.SkInput>.sbGroup:not(.sbStack)  { flex-direction: row-reverse; }
+body:not([showTeam="2"]):not([swapTeams]) [Team] ~ [Team]>.SkInput .ScoreRow  { flex-direction: row-reverse; }
+body:not([showTeam="2"]):not([swapTeams]) [Team] ~ [Team]>.SkInput .Timeouts > span  { flex-direction: row-reverse; }
+body:not([showTeam="1"])[swapTeams] [Team]:first-child>.SkInput>.sbGroup:not(.sbStack)  { flex-direction: row-reverse; }
+body:not([showTeam="1"])[swapTeams] [Team]:first-child>.SkInput .ScoreRow  { flex-direction: row-reverse; }
+body:not([showTeam="1"])[swapTeams] [Team]:first-child>.SkInput .Timeouts > span  { flex-direction: row-reverse; }
 
 /* name/logo row */
 .SkInput img.Logo { height: 50px; max-width: 200px; }
@@ -17,6 +20,7 @@ body:not([showTeam="2"]) [Team] ~ [Team]>.SkInput .Timeouts > span  { flex-direc
 .SkInput .Timeouts > span > .ToButton { flex: 2; align-self: center; height: fit-content; z-index: 1 }
 .SkInput .Timeouts { position: relative; }
 .SkInput .OfficialTimeout>div { position: absolute; right: calc(50% + (0.5 * var(--segment-gap))); width: 100%; }
+[swapTeams] .SkInput .OfficialTimeout>div { left: calc(50% + (0.5 * var(--segment-gap))); }
 .SkInput .OfficialTimeout button { transform: translateY(-50%) var(--button-transform); }
 .SkInput .OfficialTimeout button:hover { transform: translateY(-50%) var(--button-hover-transform); }
 
