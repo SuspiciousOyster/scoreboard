@@ -1,3 +1,5 @@
+[swapTeams] .PerTeam { flex-direction: row-reverse; }
+
 #Operator .Faded>:not(.JamControl) { opacity: 0.2; }
 #Operator .NoBorder { border: none; }
 

@@ -1,8 +1,10 @@
 (function () {
   _windowFunctions.configureZoom();
-  $('body').attr('showTeam', _windowFunctions.getParam('team'));
+  $('body').attr('showTeam', _windowFunctions.getParam('team'))
+    .attr('swapTeams', _windowFunctions.checkParam('swapTeams', '1') || null);
 
   $('#OptionsDialog #OptionZoomable').prop('checked', _windowFunctions.checkParam('zoomable', '1')).button();
+  $('#OptionsDialog #OptionSwapTeams').toggleClass('sbActive', _windowFunctions.checkParam('swapTeams', '1')).button();
   $('#OptionsDialog [team="' + _windowFunctions.getParam('team') + '"]').addClass('sbActive');
   $('#OptionsDialog').dialog({
     modal: true,
@@ -44,6 +46,12 @@ function setTeam(k, v, elem) {
   $('body').attr('showTeam', elem.attr('team'));
   _sbUpdateUrl('team', elem.attr('team'));
   updateTitle();
+}
+
+function setSwapTeams(k, v, elem) {
+  elem.toggleClass('sbActive');
+  _sbUpdateUrl('swapTeams', elem.filter('.sbActive').length);
+  $('body').attr('swapTeams', elem.hasClass('sbActive') || null);
 }
 
 function setZoom(k, v, elem) {
