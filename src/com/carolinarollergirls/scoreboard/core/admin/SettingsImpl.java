@@ -78,7 +78,7 @@ public final class SettingsImpl extends ScoreBoardEventProviderImpl<Settings> im
         setBothViews("HideLogos", "false");
         setBothViews("HidePenaltyClocks", "false");
         setBothViews("SidePadding", "");
-        setBothViews("SponsorScaling", "fill");
+        setBothViews("SponsorScaling", "contain");
         setBothViews("SwapTeams", "false");
         setBothViews("Video", "/videos/fullscreen/test-video.webm");
         setBothViews("VideoScaling", "contain");
