@@ -28,6 +28,11 @@ function opToggleOperatorSetting(k, v, elem) {
   _opSetOperatorSetting(elem.attr('id').split('_')[0], !elem.hasClass('sbActive'));
 }
 
+function opToggleSwapTeams(k, v, elem) {
+  elem.toggleClass('sbActive');
+  $('body').attr('swapTeams', elem.hasClass('sbActive') || null);
+}
+
 function opOpenNewGameDialog() {
   WS.SetupDialog($('#NewGameDialog'), 'ScoreBoard', {
     title: 'Start New Game',

@@ -4,11 +4,13 @@ WS.AfterLoad(function () {
     .attr('showTeam', _windowFunctions.getParam('team') || 'both')
     .attr('sbSheetStyle', _windowFunctions.getParam('pos') || 'plt')
     .attr('showNonSkaters', _windowFunctions.checkParam('nonskaters', '1') || null)
-    .attr('noCalledBy', _windowFunctions.checkParam('nocallers', '1') || null);
+    .attr('noCalledBy', _windowFunctions.checkParam('nocallers', '1') || null)
+    .attr('swapTeams', _windowFunctions.checkParam('swapTeams', '1') || null);
 
   $('#OptionsDialog #OptionZoomable').toggleClass('sbActive', _windowFunctions.checkParam('zoomable', '1')).button();
   $('#OptionsDialog #OptionNonSkaters').toggleClass('sbActive', _windowFunctions.checkParam('nonskaters', '1')).button();
   $('#OptionsDialog #OptionNoCallers').toggleClass('sbActive', _windowFunctions.checkParam('nocallers', '1')).button();
+  $('#OptionsDialog #OptionSwapTeams').toggleClass('sbActive', _windowFunctions.checkParam('swapTeams', '1')).button();
   $('#OptionsDialog [team="' + _windowFunctions.getParam('team') + '"]').addClass('sbActive');
   $('#OptionsDialog [pos="' + $('body').attr('sbSheetStyle') + '"]').addClass('sbActive');
   $('#OptionsDialog').dialog({
@@ -89,6 +91,12 @@ function setNoCallers(k, v, elem) {
   elem.toggleClass('sbActive');
   _sbUpdateUrl('nocallers', elem.filter('.sbActive').length);
   $('body').attr('noCalledBy', elem.hasClass('sbActive') || null);
+}
+
+function setSwapTeams(k, v, elem) {
+  elem.toggleClass('sbActive');
+  _sbUpdateUrl('swapTeams', elem.filter('.sbActive').length);
+  $('body').attr('swapTeams', elem.hasClass('sbActive') || null);
 }
 
 function setZoom(k, v, elem) {

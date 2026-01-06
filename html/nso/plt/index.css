@@ -9,8 +9,8 @@ body[showTeam="1"]>.Content { grid-template-columns: 1fr 0; }
 body[showTeam="2"]>.Content { grid-template-columns: 0 1fr; }
 .Content>.GameAdvance { grid-area: 1 / 1 / 2 / 3; }
 .Content>.JamAdvance { grid-area: 3 / 1 / 4 / 3; }
-.Content>[Team="1"], body[showTeam="1"]>.Content>.JamAdvance { grid-column: 1 / 2; }
-.Content>[Team="2"], body[showTeam="2"]>.Content>.JamAdvance { grid-column: 2 / 3; }
+.Content>[Team="1"], [swapTeams][showTeam="both"] .Content>[Team="2"], body[showTeam="1"]>.Content>.JamAdvance { grid-column: 1 / 2; }
+.Content>[Team="2"], [swapTeams][showTeam="both"] .Content>[Team="1"], body[showTeam="2"]>.Content>.JamAdvance { grid-column: 2 / 3; }
 .Content>.Input { grid-row: 2 / 3; }
 .Content>.Sheet { grid-row: 4 / 5; }
 
