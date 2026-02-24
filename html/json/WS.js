@@ -740,12 +740,13 @@ var WS = {
             element: elem,
             triggerFunc: function (k, v) {
               const key = options.part ? k[field].split('.').slice(0, options.part).join('.') + '.*' : k[field];
-              const subfieldId = 'data-' + k[field].replaceAll('.', '-');
+              const safeKey = key.replaceAll('\"', '\\\"');
+              const subfieldId = 'data-' + k[field].replaceAll(/\W/g, '-');
               if (blockedKeys[key]) {
                 return;
               } else if (v == null) {
                 if (key !== k[field]) {
-                  const target = paren.children('[' + field + '="' + key + '"][' + subfieldId + '][sbSubId="' + subId + '"]:not(.sbFixed)');
+                  const target = paren.children('[' + field + '="' + safeKey + '"][' + subfieldId + '][sbSubId="' + subId + '"]:not(.sbFixed)');
                   const removed = target
                     .attr(subfieldId, null)
                     .attr('sbCount', target.attr('sbCount') - 1)
@@ -761,7 +762,7 @@ var WS = {
                     removed.remove();
                   }
                 } else {
-                  const removed = paren.children('[' + field + '="' + key + '"][sbSubId="' + subId + '"]:not(.sbFixed)');
+                  const removed = paren.children('[' + field + '="' + safeKey + '"][sbSubId="' + subId + '"]:not(.sbFixed)');
                   if (removed.length) {
                     if (options.onRemove) {
                       removed.each(function () {
@@ -773,7 +774,7 @@ var WS = {
                     removed.remove();
                   }
                 }
-              } else if (!paren.children('[' + field + '="' + key + '"][sbSubId="' + subId + '"]').length) {
+              } else if (!paren.children('[' + field + '="' + safeKey + '"][sbSubId="' + subId + '"]').length) {
                 const newElem = elem.clone(true).attr(field, key).appendTo(paren);
                 if (!options.noContext) {
                   newElem.attr(
@@ -814,9 +815,9 @@ var WS = {
                 }
               } else if (
                 key !== k[field] &&
-                !paren.children('[' + field + '="' + key + '"][' + subfieldId + '][sbSubId="' + subId + '"]').length
+                !paren.children('[' + field + '="' + safeKey + '"][' + subfieldId + '][sbSubId="' + subId + '"]').length
               ) {
-                const target = paren.children('[' + field + '="' + key + '"][sbSubId="' + subId + '"]:not(.sbFixed)');
+                const target = paren.children('[' + field + '="' + safeKey + '"][sbSubId="' + subId + '"]:not(.sbFixed)');
                 target.attr(subfieldId, k[field]).attr('sbCount', Number(target.attr('sbCount')) + 1);
               }
             },
