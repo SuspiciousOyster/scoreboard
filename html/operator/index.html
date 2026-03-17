@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Operator | CRG Simple ScoreBoard</title>
+    <script type="text/javascript" src="/external/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/json/core.js"></script>
+  </head>
+  <body sbContext="ScoreBoard">
+    <div class="Container">
+      <div class="sbSegment Intermediate">
+        <div class="sbGroup Name Team1"><input type="text" size="40" sbControl="Team1Name" /></div>
+        <div class="sbGroup Score Team1">
+          <button class="sbImportant" sbSet="Team1Points:-1:change">-</button>
+          <span class="sbVeryVeryImportant" sbDisplay="Team1Points"></span>
+          <button class="sbImportant" sbSet="Team1Points:1:change">+</button>
+        </div>
+      </div>
+      <div class="sbSegment Intermediate">
+        <div class="sbGroup Name Team2"><input type="text" size="40" sbControl="Team2Name" /></div>
+        <div class="sbGroup Score Team2">
+          <button class="sbImportant" sbSet="Team2Points:-1:change">-</button>
+          <span class="sbVeryVeryImportant" sbDisplay="Team2Points"></span>
+          <button class="sbImportant" sbSet="Team2Points:1:change">+</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

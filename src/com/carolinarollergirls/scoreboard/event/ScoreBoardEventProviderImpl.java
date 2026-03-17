@@ -10,12 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import com.carolinarollergirls.scoreboard.core.interfaces.FloorPosition;
-import com.carolinarollergirls.scoreboard.core.interfaces.Game;
-import com.carolinarollergirls.scoreboard.core.interfaces.Role;
 import com.carolinarollergirls.scoreboard.core.interfaces.ScoreBoard;
-import com.carolinarollergirls.scoreboard.core.interfaces.TimeoutOwner;
-import com.carolinarollergirls.scoreboard.rules.RuleDefinition;
 import com.carolinarollergirls.scoreboard.utils.Logger;
 import com.carolinarollergirls.scoreboard.utils.ValWithId;
 
@@ -425,13 +420,8 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
         synchronized (coreLock) {
             @SuppressWarnings("rawtypes")
             Class type = prop.getType();
-            if (type == TimeoutOwner.class) { return (T) scoreBoard.getTimeoutOwner(sValue); }
             if (sValue == null) { return prop.getDefaultValue(); }
             if ("".equals(sValue) && !(type == String.class)) { return prop.getDefaultValue(); }
-            if (type == RuleDefinition.Type.class) { return prop.getDefaultValue(); }
-            if (type == Role.class) { return (T) Role.fromString(sValue); }
-            if (type == FloorPosition.class) { return (T) FloorPosition.fromString(sValue); }
-            if (type == Game.State.class) { return (T) Game.State.fromString(sValue); }
             if (type == Boolean.class) { return (T) Boolean.valueOf(sValue); }
             if (type == Integer.class) { return (T) Integer.valueOf(sValue); }
             if (type == Long.class) { return (T) Long.valueOf(sValue); }
@@ -720,7 +710,8 @@ public abstract class ScoreBoardEventProviderImpl<C extends ScoreBoardEventProvi
     /**
      * To be overridden by implementations. Postprocess <code>Child</code> updates.
      * <p>
-     * This is called after a new <code>Child</code> instance has been removed and after all event listeners have finished.
+     * This is called after a new <code>Child</code> instance has been removed and after all event listeners have
+     * finished.
      */
     protected void itemRemoved(Child<?> prop, ValueWithId item, Source source) {}
     @Override

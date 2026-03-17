@@ -20,17 +20,9 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 
-import com.carolinarollergirls.scoreboard.core.game.GameImpl;
 import com.carolinarollergirls.scoreboard.core.interfaces.Clients.Client;
 import com.carolinarollergirls.scoreboard.core.interfaces.Clients.Device;
-import com.carolinarollergirls.scoreboard.core.interfaces.Clock;
-import com.carolinarollergirls.scoreboard.core.interfaces.Jam;
-import com.carolinarollergirls.scoreboard.core.interfaces.Period;
-import com.carolinarollergirls.scoreboard.core.interfaces.PreparedTeam;
-import com.carolinarollergirls.scoreboard.core.interfaces.Rulesets.Ruleset;
 import com.carolinarollergirls.scoreboard.core.interfaces.ScoreBoard;
-import com.carolinarollergirls.scoreboard.core.interfaces.Team;
-import com.carolinarollergirls.scoreboard.core.interfaces.Timeout;
 import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProvider.Flag;
 import com.carolinarollergirls.scoreboard.event.ScoreBoardEventProvider.Source;
 import com.carolinarollergirls.scoreboard.json.JSONStateListener;
@@ -162,82 +154,6 @@ public class WS extends WebSocketServlet {
                         @Override
                         public void run() {
                             ScoreBoardJSONSetter.set(sb, Collections.singletonList(js), Source.WS);
-                        }
-                    });
-                    break;
-                case "StartNewGame":
-                    sbClient.write();
-                    @SuppressWarnings("unchecked")
-                    final Map<String, Object> data = (Map<String, Object>) json.get("data");
-                    sb.runInBatch(new Runnable() {
-                        @Override
-                        public void run() {
-                            PreparedTeam t1 = sb.getPreparedTeam((String) data.get("Team1"));
-                            PreparedTeam t2 = sb.getPreparedTeam((String) data.get("Team2"));
-                            Ruleset rs = sb.getRulesets().getRuleset((String) data.get("Ruleset"));
-                            GameImpl g = new GameImpl(sb, t1, t2, rs);
-                            sb.add(ScoreBoard.GAME, g);
-                            sb.getCurrentGame().load(g);
-
-                            if ((Boolean) data.get("Advance")) {
-                                g.allowQuickClockControls(true);
-                                g.startJam();
-                                g.timeout();
-                                for (int i = 0; i < (Integer) data.get("TO1"); i++) {
-                                    g.setTimeoutType(g.getTeam(Team.ID_1), false);
-                                    g.getClock(Clock.ID_TIMEOUT).elapseTime(1000); // avoid double click detection
-                                    g.timeout();
-                                }
-                                for (int i = 0; i < (Integer) data.get("TO2"); i++) {
-                                    g.setTimeoutType(g.getTeam(Team.ID_2), false);
-                                    g.getClock(Clock.ID_TIMEOUT).elapseTime(1000); // avoid double click detection
-                                    g.timeout();
-                                }
-                                for (int i = 0; i < (Integer) data.get("OR1"); i++) {
-                                    g.setTimeoutType(g.getTeam(Team.ID_1), true);
-                                    g.getClock(Clock.ID_TIMEOUT).elapseTime(1000); // avoid double click detection
-                                    g.timeout();
-                                }
-                                for (int i = 0; i < (Integer) data.get("OR2"); i++) {
-                                    g.setTimeoutType(g.getTeam(Team.ID_2), true);
-                                    g.getClock(Clock.ID_TIMEOUT).elapseTime(1000); // avoid double click detection
-                                    g.timeout();
-                                }
-                                g.setTimeoutType(Timeout.Owners.OTO, false);
-                                g.getTeam(Team.ID_1).set(Team.TRIP_SCORE, (Integer) data.get("Points1"));
-                                g.getTeam(Team.ID_2).set(Team.TRIP_SCORE, (Integer) data.get("Points2"));
-                                int period = (Integer) data.get("Period");
-                                int jam = (Integer) data.get("Jam");
-                                if (jam == 0 && period > 1) {
-                                    g.getClock(Clock.ID_PERIOD)
-                                        .elapseTime(g.getClock(Clock.ID_PERIOD).getMaximumTime() + 1000);
-                                    g.stopJamTO();
-                                    g.getClock(Clock.ID_INTERMISSION)
-                                        .elapseTime(g.getClock(Clock.ID_INTERMISSION).getMaximumTime() + 1000);
-                                    for (int i = 2; i < period; i++) {
-                                        g.getCurrentPeriod().execute(Period.INSERT_BEFORE);
-                                    }
-                                } else {
-                                    for (int i = 1; i < period; i++) {
-                                        g.getCurrentPeriod().execute(Period.INSERT_BEFORE);
-                                    }
-                                    for (int i = 1; i < jam; i++) {
-                                        g.getCurrentPeriod().getCurrentJam().execute(Jam.INSERT_BEFORE);
-                                    }
-                                }
-                                long periodClock = Long.valueOf((String) data.get("PeriodClock"));
-                                if (periodClock > 0) { g.getClock(Clock.ID_PERIOD).setTime(periodClock); }
-                                g.allowQuickClockControls(false);
-                            } else {
-                                String intermissionClock = (String) data.get("IntermissionClock");
-                                if (intermissionClock != null) {
-                                    Long ic_time = Long.valueOf(intermissionClock);
-                                    ic_time = ic_time - (ic_time % 1000);
-                                    Clock c = g.getClock(Clock.ID_INTERMISSION);
-                                    c.setMaximumTime(ic_time);
-                                    c.restart();
-                                }
-                            }
                         }
                     });
                     break;

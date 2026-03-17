@@ -13,7 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.carolinarollergirls.scoreboard.core.interfaces.Jam;
+import com.carolinarollergirls.scoreboard.core.interfaces.ScoreBoard;
 
 public class EventPackageTests {
 
@@ -704,6 +704,6 @@ public class EventPackageTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void testThrowsOnSettingPropertyFromDifferentClass() {
-        root.set(Jam.DURATION, 0L);
+        root.set(ScoreBoard.TEAM_1_POINTS, 0);
     }
 }

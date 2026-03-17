@@ -5,8 +5,6 @@ import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.util.EnumSet;
 import java.util.Iterator;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServlet;
@@ -95,9 +93,6 @@ public class ScoreBoardWebserver {
 
         HttpServlet ljs = new LoadJsonScoreBoard(scoreBoard);
         sch.addServlet(new ServletHolder(ljs), "/Load/*");
-
-        HttpServlet ms = new MediaServlet(scoreBoard, new File(BasePath.get(), "html").getPath());
-        sch.addServlet(new ServletHolder(ms), "/Media/*");
     }
 
     public void start() {
@@ -125,15 +120,6 @@ public class ScoreBoardWebserver {
         Logger.printMessage("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         Logger.printMessage("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         Logger.printMessage("");
-
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                int removed =
-                    scoreBoard.getClients().gcOldDevices(System.currentTimeMillis() - COOKIE_DURATION_SECONDS * 1000);
-                if (removed > 0) { Logger.printMessage("Garbage collected " + removed + " old device(s)."); }
-            }
-        }, 0, 3600, TimeUnit.SECONDS);
     }
 
     protected ScoreBoard scoreBoard;
