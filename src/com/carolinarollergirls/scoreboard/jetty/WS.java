@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
@@ -254,10 +255,7 @@ public class WS extends WebSocketServlet {
                     break;
                 default: sendError("Unknown Action '" + action + "'"); break;
                 }
-            } catch (Exception je) {
-                Logger.printMessage("Error handling JSON message: " + je);
-                Logger.printStackTrace(je);
-            }
+            } catch (Throwable je) { Logger.printStackTrace("handling JSON message: ", je); }
         }
 
         public void send(Map<String, Object> json) {
@@ -266,8 +264,7 @@ public class WS extends WebSocketServlet {
                 wsSession.getRemote().sendStringByFuture(
                     JSON.std.with(JSON.Feature.WRITE_NULL_PROPERTIES).composeString().addObject(json).finish());
             } catch (Exception e) {
-                Logger.printMessage("Error sending JSON update: " + e);
-                Logger.printStackTrace(e);
+                Logger.printStackTrace("sending JSON update", e);
                 if (useMetrics) { messagesSentFailures.inc(); }
             } finally {
                 if (useMetrics) { timer.observeDuration(); }
@@ -301,6 +298,11 @@ public class WS extends WebSocketServlet {
             sb.getClients().removeClient(sbClient);
 
             device.access();
+        }
+
+        @OnWebSocketError
+        public void onError(Throwable error) {
+            Logger.printStackTrace("webserver", error);
         }
 
         public void sendError(String message) {
