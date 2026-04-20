@@ -15,4 +15,4 @@ if [ -x /usr/libexec/java_home ]; then
   JAVA="/usr/libexec/java_home -exec java"
 fi
 
-exec $JAVA -Done-jar.silent=true -Dorg.eclipse.jetty.server.LEVEL=WARN -jar "${loc}/lib/crg-scoreboard.jar" ${GUI} "$@"
+exec $JAVA -Done-jar.silent=true -Dorg.eclipse.jetty.server.LEVEL=WARN -jar lib/crg-scoreboard.jar ${GUI} "$@"
