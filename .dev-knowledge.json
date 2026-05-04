@@ -1,0 +1,7 @@
+{
+  "required_knowledge": [
+    { "query": "CRG ScoreBoard WebSocket API WS.Register state paths", "source": "repo" },
+    { "query": "custom view html structure core.js bootstrap pattern", "source": "repo" }
+  ],
+  "external_docs": []
+}
