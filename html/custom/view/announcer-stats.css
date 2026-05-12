@@ -1,0 +1,483 @@
+/*
+ * Announcer Statistics Dashboard — Custom View for CRG ScoreBoard
+ *
+ * Copyright (C) 2024 SuspiciousOyster
+ * Licensed under the GNU General Public License v3 or later, or Apache 2.0.
+ *
+ * Dark-theme styling for the real-time tabular statistics dashboard
+ * used by roller derby announcers.
+ */
+
+/* ── Reset & Base ── */
+html {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 100%;
+}
+
+body.preload * {
+  transition: none !important;
+}
+
+/* ── Layout ── */
+.announcer-dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px 20px;
+}
+
+/* ── Header Section (A) ── */
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #16213e;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  border: 1px solid #0f3460;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.game-header .team-block {
+  flex: 1;
+  text-align: center;
+}
+
+.game-header .team-block .team-name {
+  font-size: 1.6em;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.game-header .team-block .team-score {
+  font-size: 2.4em;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.game-header .team-block .jam-score {
+  font-size: 0.95em;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.game-header .team-block .team-timeouts {
+  font-size: 0.85em;
+  margin-top: 6px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.game-header .team-block .team-timeouts .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: inline-block;
+}
+
+.game-header .team-block .team-timeouts .dot.used {
+  opacity: 0.2;
+}
+
+.game-header .center-clock {
+  flex: 1.2;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.game-header .center-clock .phase-indicator {
+  display: inline-block;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.game-header .center-clock .phase-indicator.in-jam {
+  background: #e94560;
+  color: #fff;
+}
+
+.game-header .center-clock .phase-indicator.timeout {
+  background: #d4a017;
+  color: #fff;
+}
+
+.game-header .center-clock .phase-indicator.lineup {
+  background: #533483;
+  color: #fff;
+}
+
+.game-header .center-clock .phase-indicator.intermission {
+  background: #1a5276;
+  color: #fff;
+}
+
+.game-header .center-clock .phase-indicator.pregame {
+  background: #2c3e50;
+  color: #aaa;
+}
+
+.game-header .center-clock .period-clock {
+  font-size: 2.8em;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.game-header .center-clock .jam-clock {
+  font-size: 2em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+  margin-top: -2px;
+}
+
+.game-header .center-clock .clock-labels {
+  font-size: 0.75em;
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 2px;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* ── Section Layout ── */
+.dashboard-section {
+  background: #16213e;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  border: 1px solid #0f3460;
+  overflow: hidden;
+}
+
+.dashboard-section h2 {
+  font-size: 1.1em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 12px 20px;
+  margin: 0;
+  background: #0f3460;
+  color: #e0e0e0;
+  border-bottom: 2px solid #1a1a2e;
+}
+
+.dashboard-section .section-content {
+  padding: 12px 16px;
+}
+
+/* ── Stats Tables ── */
+table.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+table.stats-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-weight: 600;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  border-bottom: 1px solid #2a2a4a;
+}
+
+table.stats-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #1e1e3a;
+  font-variant-numeric: tabular-nums;
+}
+
+table.stats-table tr:last-child td {
+  border-bottom: none;
+}
+
+table.stats-table .team-color-bar {
+  width: 4px;
+  padding: 0;
+  border-radius: 2px;
+}
+
+table.stats-table .num {
+  text-align: right;
+  font-weight: 600;
+}
+
+table.stats-table .center {
+  text-align: center;
+}
+
+/* ── Per-Team Aggregated Stats (B) ── */
+.team-stats-container {
+  display: flex;
+  gap: 16px;
+}
+
+.team-stats-container .team-stats-col {
+  flex: 1;
+}
+
+.team-stats-container .team-stats-col h3 {
+  margin: 0 0 8px 0;
+  font-size: 1em;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+table.agg-stats {
+  width: 100%;
+}
+
+table.agg-stats td {
+  padding: 6px 12px;
+}
+
+table.agg-stats td:first-child {
+  color: #aaa;
+  font-weight: 500;
+}
+
+table.agg-stats td:last-child {
+  text-align: right;
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+/* ── Penalty Leaders (C) ── */
+.penalty-leaders-container {
+  display: flex;
+  gap: 16px;
+}
+
+.penalty-leaders-container .penalty-leaders-col {
+  flex: 1;
+}
+
+.penalty-leaders-container .penalty-leaders-col h3 {
+  margin: 0 0 8px 0;
+  font-size: 1em;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+table.penalty-leaders td {
+  padding: 4px 8px;
+}
+
+table.penalty-leaders td.num {
+  width: 30px;
+}
+
+table.penalty-leaders td.name-col {
+  font-weight: 500;
+}
+
+table.penalty-leaders td.penalty-count {
+  font-weight: 700;
+  text-align: center;
+  width: 40px;
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+table.penalty-leaders td.penalty-codes {
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+/* ── Jammer Performance (D) ── */
+table.jammer-performance td.rank {
+  width: 30px;
+  color: #888;
+  font-weight: 600;
+}
+
+table.jammer-performance td.skater-name {
+  font-weight: 600;
+}
+
+table.jammer-performance td.skater-team {
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+/* ── Jam Log (E) ── */
+.jam-log-scroll {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+table.jam-log {
+  width: 100%;
+}
+
+table.jam-log th {
+  padding: 6px 8px;
+  font-size: 0.75em;
+}
+
+table.jam-log td {
+  padding: 4px 8px;
+  font-size: 0.9em;
+}
+
+table.jam-log td.lead-star {
+  font-size: 1em;
+  text-align: center;
+}
+
+table.jam-log .jam-row.period-break td {
+  border-top: 2px solid #0f3460;
+  padding-top: 8px;
+}
+
+/* ── Penalty Code Breakdown (F) ── */
+.penalty-breakdown-container {
+  display: flex;
+  gap: 16px;
+}
+
+.penalty-breakdown-container .pb-col {
+  flex: 1;
+}
+
+.penalty-breakdown-container .pb-col h3 {
+  margin: 0 0 8px 0;
+  font-size: 1em;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.penalty-bar-wrapper {
+  display: flex;
+  align-items: center;
+  margin: 3px 0;
+}
+
+.penalty-bar-wrapper .pb-code {
+  width: 36px;
+  font-weight: 700;
+  font-size: 0.85em;
+  text-align: right;
+  padding-right: 8px;
+  font-family: 'Courier New', monospace;
+}
+
+.penalty-bar-wrapper .pb-bar-bg {
+  flex: 1;
+  height: 20px;
+  background: #1a1a2e;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.penalty-bar-wrapper .pb-bar {
+  height: 100%;
+  border-radius: 4px;
+  min-width: 4px;
+  transition: width 0.3s ease;
+}
+
+.penalty-bar-wrapper .pb-count {
+  width: 30px;
+  text-align: right;
+  padding-left: 6px;
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+/* ── Empty / Loading States ── */
+.loading-message,
+.empty-message {
+  text-align: center;
+  padding: 24px;
+  color: #666;
+  font-style: italic;
+}
+
+.loading-message::before {
+  content: '⏳ ';
+}
+
+/* ── Scrollbar Styling ── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a2e;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0f3460;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1a5276;
+}
+
+/* ── Status Message ── */
+.connection-status {
+  text-align: center;
+  padding: 6px 12px;
+  font-size: 0.75em;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  display: none;
+}
+
+.connection-status.show {
+  display: block;
+}
+
+.connection-status.connected {
+  background: #1b4332;
+  color: #52b788;
+}
+
+.connection-status.disconnected {
+  background: #5a1a1a;
+  color: #e94560;
+}
+
+/* ── Team 2 section separator ── */
+table.jam-log .team2-label td {
+  border-top: 1px solid #2a2a4a;
+  font-size: 0.75em;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-top: 8px;
+}
