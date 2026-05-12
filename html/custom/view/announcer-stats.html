@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Announcer Stats | CRG ScoreBoard</title>
+
+    <!--
+      Announcer Statistics Dashboard — Custom View for CRG ScoreBoard
+      Provides a real-time tabular statistics dashboard for roller derby announcers.
+
+      Sections:
+        [A] Live header — team names, scores, clocks, timeouts, ORs
+        [B] Per-team aggregated stats table
+        [C] Penalty leaders (top 5 per team)
+        [D] Jammer performance table (sorted by points)
+        [E] Jam log (last 15 jams)
+        [F] Penalty code breakdown
+
+      Licensed under the GNU General Public License v3 or later, or Apache 2.0.
+    -->
+
+    <script type="text/javascript" src="/external/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/json/core.js"></script>
+
+    <link rel="stylesheet" href="announcer-stats.css" type="text/css" />
+    <style type="text/css" title="jsStyle"></style>
+  </head>
+  <body class="preload sbNoConnectionStatus">
+    <div class="announcer-dashboard">
+
+      <!-- Connection Status -->
+      <div id="connection-status" class="connection-status"></div>
+
+      <!-- [A] Live Header Section -->
+      <section id="game-header" class="dashboard-section game-header"></section>
+
+      <!-- [B] Per-Team Aggregated Stats -->
+      <section class="dashboard-section">
+        <h2>Team Stats</h2>
+        <div id="team-stats" class="section-content">
+          <div class="loading-message">Loading team stats...</div>
+        </div>
+      </section>
+
+      <!-- [C] Penalty Leaders -->
+      <section class="dashboard-section">
+        <h2>Penalty Leaders</h2>
+        <div id="penalty-leaders" class="section-content">
+          <div class="loading-message">Loading penalty data...</div>
+        </div>
+      </section>
+
+      <!-- [D] Jammer Performance -->
+      <section class="dashboard-section">
+        <h2>Jammer Performance</h2>
+        <div id="jammer-performance" class="section-content">
+          <div class="loading-message">Loading jammer data...</div>
+        </div>
+      </section>
+
+      <!-- [E] Jam Log (Last 15 Jams) -->
+      <section class="dashboard-section">
+        <h2>Jam Log (Last 15)</h2>
+        <div id="jam-log" class="section-content">
+          <div class="loading-message">Loading jam log...</div>
+        </div>
+      </section>
+
+      <!-- [F] Penalty Code Breakdown -->
+      <section class="dashboard-section">
+        <h2>Penalty Code Breakdown</h2>
+        <div id="penalty-breakdown" class="section-content">
+          <div class="loading-message">Loading penalty breakdown...</div>
+        </div>
+      </section>
+
+    </div>
+
+    <script type="text/javascript" src="announcer-stats.js"></script>
+  </body>
+</html>

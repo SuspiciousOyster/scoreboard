@@ -18,6 +18,9 @@ html/videos/fullscreen
 html/game-data
 html/custom
 !html/custom/view/example.html
+!html/custom/view/announcer-stats.html
+!html/custom/view/announcer-stats.css
+!html/custom/view/announcer-stats.js
 html/themes/custom
 GameData
 android/.gradle/
