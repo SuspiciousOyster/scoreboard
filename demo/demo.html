@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Announcer Jammers — Demo</title>
+
+    <!-- Load jQuery from CDN for the standalone demo -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Load mock WS (defines WS, startGameScenario, resetScenario) -->
+    <script src="mock-ws.js"></script>
+
+    <!-- Load shared render logic (uses WS.*, populates #game-stats, #jammer-table-N) -->
+    <script src="../html/custom/view/announcer-jammers-render.js"></script>
+
+    <link rel="stylesheet" href="../html/custom/view/announcer-jammers.css">
+  </head>
+  <body class="preload">
+    <div class="announcer-jammers">
+
+      <!-- Demo Status Bar -->
+      <div id="connection-status" class="connection-status" style="display:flex;align-items:center;justify-content:space-between">
+        <span>🎯 Demo Mode</span>
+        <span>
+          <button id="btn-start" class="demo-btn">▶ Start Demo Game</button>
+          <button id="btn-reset" class="demo-btn demo-btn-secondary" style="display:none">⟳ Reset</button>
+        </span>
+      </div>
+
+      <!-- Game Stats Header -->
+      <div id="game-stats" class="game-stats-header">
+        <div class="empty-message">Click "Start Demo Game" to begin…</div>
+      </div>
+
+      <!-- Team 1 Section -->
+      <section class="team-section">
+        <div class="team-header" id="team-header-1">
+          <span class="team-name" id="team-name-1">Thunderbirds</span>
+          <span class="team-score-display">Score: <strong id="team-score-1">0</strong></span>
+        </div>
+        <div class="team-table-wrapper">
+          <div id="jammer-table-1">
+            <div class="empty-message">Click "Start Demo Game" to begin…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Team 2 Section -->
+      <section class="team-section">
+        <div class="team-header" id="team-header-2">
+          <span class="team-name" id="team-name-2">Valkyries</span>
+          <span class="team-score-display">Score: <strong id="team-score-2">0</strong></span>
+        </div>
+        <div class="team-table-wrapper">
+          <div id="jammer-table-2">
+            <div class="empty-message">Click "Start Demo Game" to begin…</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Demo Controls -->
+    <style>
+      .demo-btn {
+        background: #238636;
+        color: #fff;
+        border: 1px solid rgba(240,246,252,0.1);
+        border-radius: 6px;
+        padding: 4px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s ease;
+      }
+      .demo-btn:hover {
+        background: #2ea043;
+      }
+      .demo-btn:active {
+        background: #238636;
+      }
+      .demo-btn-secondary {
+        background: #21262d;
+        color: #c9d1d9;
+        border-color: #30363d;
+      }
+      .demo-btn-secondary:hover {
+        background: #30363d;
+      }
+    </style>
+
+    <script>
+      (function () {
+        'use strict';
+
+        var btnStart = document.getElementById('btn-start');
+        var btnReset = document.getElementById('btn-reset');
+
+        btnStart.addEventListener('click', function () {
+          // Reset any previous state
+          if (typeof resetScenario === 'function') resetScenario();
+          // Populate mock state with initial teams + skaters then render
+          WS._fireAfterLoad();
+          // Start the game scenario
+          startGameScenario();
+          btnStart.textContent = '▶ Running…';
+          btnStart.disabled = true;
+          btnReset.style.display = 'inline';
+        });
+
+        btnReset.addEventListener('click', function () {
+          if (typeof resetScenario === 'function') resetScenario();
+          // Re-render to show empty state
+          var emptyEls = document.querySelectorAll('.empty-message');
+          if (emptyEls.length > 0) {
+            document.getElementById('game-stats').innerHTML =
+              '<div class="empty-message">Click "Start Demo Game" to begin…</div>';
+            document.getElementById('jammer-table-1').innerHTML =
+              '<div class="empty-message">Click "Start Demo Game" to begin…</div>';
+            document.getElementById('jammer-table-2').innerHTML =
+              '<div class="empty-message">Click "Start Demo Game" to begin…</div>';
+          }
+          btnStart.textContent = '▶ Start Demo Game';
+          btnStart.disabled = false;
+        });
+      })();
+    </script>
+  </body>
+</html>

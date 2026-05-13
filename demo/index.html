@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Announcer Jammers View — Demo</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      body {
+        background: #0d1117;
+        color: #e6edf3;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+      }
+
+      .landing {
+        max-width: 560px;
+        padding: 40px 24px;
+      }
+
+      .logo {
+        font-size: 48px;
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
+      }
+
+      .subtitle {
+        color: #8b949e;
+        font-size: 16px;
+        margin-bottom: 32px;
+        line-height: 1.5;
+      }
+
+      .feature-list {
+        text-align: left;
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 20px 24px;
+        margin-bottom: 32px;
+      }
+
+      .feature-list h3 {
+        font-size: 14px;
+        color: #8b949e;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+      }
+
+      .feature-list ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .feature-list li {
+        padding: 6px 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #c9d1d9;
+      }
+
+      .feature-list li::before {
+        content: '▸ ';
+        color: #58a6ff;
+      }
+
+      .btn-start {
+        display: inline-block;
+        background: #238636;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 14px 40px;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.15s ease, transform 0.1s ease;
+      }
+
+      .btn-start:hover {
+        background: #2ea043;
+        transform: translateY(-1px);
+      }
+
+      .btn-start:active {
+        transform: translateY(0);
+      }
+
+      .footer {
+        margin-top: 32px;
+        font-size: 12px;
+        color: #484f58;
+      }
+
+      .footer a {
+        color: #58a6ff;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="landing">
+
+      <div class="logo">🎯</div>
+
+      <h1>Announcer Jammers View</h1>
+      <p class="subtitle">
+        A live jammer-performance dashboard for roller derby announcers.<br>
+        Real-time stats, scoring pass breakdowns, and team comparisons —<br>
+        designed for game day.
+      </p>
+
+      <div class="feature-list">
+        <h3>What you'll see</h3>
+        <ul>
+          <li>Per-jammer stats: lap scores, jams played, lead %, total score, PPJ, team contribution</li>
+          <li>Game stats header: lead %, lead count, score, points-per-jam, ratio</li>
+          <li>Star pass detection with visual differentiation</li>
+          <li>Live reactive updates as the game progresses</li>
+          <li>Dark theme — ready for the announcer booth</li>
+        </ul>
+      </div>
+
+      <a href="demo.html" class="btn-start">▶ Start Demo</a>
+
+      <p class="footer">
+        Custom view for <a href="https://github.com/rollerderby/scoreboard" target="_blank">CRG ScoreBoard</a>
+      </p>
+
+    </div>
+  </body>
+</html>
