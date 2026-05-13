@@ -53,6 +53,35 @@
     '%T': 'Share of total team score. (Jammer score ÷ Team score) × 100.',
   };
 
+  /* ── Penalty code to emoji mapping ── */
+  var PENALTY_EMOJI = {
+    'IllegalProcedure': '🚫',
+    'IllegalZone': '✋',
+    'BackBlock': '🔙',
+    'LowBlock': '⬇️',
+    'HighBlock': '⬆️',
+    'IllegalContact': '❌',
+    'Misconduct': '❗',
+    'Unnecessary': '⚠️',
+    'Cutting': '✂️',
+    'DirectionOfPlay': '🔁',
+    'Interference': '🤝',
+    'OutOfPlay': '👋',
+    'SkatingOutOfPlay': '🚶',
+    'FailureToReform': '🔄',
+    'Insubordination': '📢',
+    'Injury': '🏥',
+  };
+
+  /** Convert a penalty code to an emoji, fallback to short code text. */
+  function penEmoji(code) {
+    if (!code) return '❓';
+    if (PENALTY_EMOJI[code]) return PENALTY_EMOJI[code];
+    var uc = code.charAt(0).toUpperCase() + code.slice(1);
+    if (PENALTY_EMOJI[uc]) return PENALTY_EMOJI[uc];
+    return code.slice(0, 3);
+  }
+
   /** Show a positioned tooltip popup near the clicked element. */
   function showTooltip(text, anchor) {
     var el = document.getElementById('tip-popup');
@@ -143,8 +172,8 @@
         return;
       }
 
-      // Direct field (JamScore, Lead, Lost, StarPass, Calloff, TotalScore)
-      var directFields = ['JamScore', 'Lead', 'Lost', 'StarPass', 'Calloff', 'TotalScore'];
+      // Direct field (JamScore, Lead, Lost, StarPass, Calloff, TotalScore, NoInitial)
+      var directFields = ['JamScore', 'Lead', 'Lost', 'StarPass', 'Calloff', 'TotalScore', 'NoInitial'];
       if (directFields.indexOf(rest) !== -1) {
         tj[rest] = WS.state[key];
       }
@@ -215,10 +244,11 @@
     var jammers = {};
     // Per-team counters
     var teamStats = {
-      '1': { leadCount: 0, totalScore: 0, totalJams: 0 },
-      '2': { leadCount: 0, totalScore: 0, totalJams: 0 }
+      '1': { leadCount: 0, totalScore: 0, totalJams: 0, calloffCount: 0, starPassCount: 0, lostCount: 0, noInitialCount: 0, allowedWhileLead: 0, scoredVsLead: 0 },
+      '2': { leadCount: 0, totalScore: 0, totalJams: 0, calloffCount: 0, starPassCount: 0, lostCount: 0, noInitialCount: 0, allowedWhileLead: 0, scoredVsLead: 0 }
     };
     var totalJamsCount = 0;
+    var jamScoreHistory = []; // [{jamNum, t1score, t2score}] for score timeline
 
     function getJammerKey(teamNum, skaterRef) {
       return teamNum + ':' + (skaterRef || '').trim();
@@ -246,6 +276,7 @@
     // Iterate each jam
     teamJams.forEach(function (jam) {
       totalJamsCount++;
+      var t1Score = 0, t2Score = 0;
       [1, 2].forEach(function (teamNum) {
         var tj = jam.teams[teamNum];
         if (!tj) return;
@@ -254,11 +285,27 @@
         var jamScore = asNum(tj.JamScore);
         var isLead = isTrue(tj.Lead);
         var starPass = isTrue(tj.StarPass);
+        var isCalloff = isTrue(tj.Calloff);
+        var isLost = isTrue(tj.Lost);
+        var isNoInitial = isTrue(tj.NoInitial);
+
+        // Track per-jam scores for timeline
+        if (teamNum === 1) t1Score = jamScore;
+        else t2Score = jamScore;
 
         // Update team stats
         teamStats[tn].totalScore += jamScore;
         teamStats[tn].totalJams++;
         if (isLead) teamStats[tn].leadCount++;
+        if (isCalloff) teamStats[tn].calloffCount++;
+        if (starPass) teamStats[tn].starPassCount++;
+        if (isLost) teamStats[tn].lostCount++;
+        if (isNoInitial) teamStats[tn].noInitialCount++;
+
+        // "Points allowed while lead" — team had lead and didn't lose it,
+        // but opponent still scored. Indicates poor lead-jammer awareness.
+        // We need the opponent's lead and lost status, so this is computed
+        // after both team's data is collected (below).
 
         // Find jammer(s)
         // In real scoreboard, fielding is keyed by FloorPosition name:
@@ -363,8 +410,28 @@
         if (jamScore > 0 && jammerRefs.length === 0) {
           // Can't attribute — skip
         }
-      });
-    });
+      }); // end [1,2].forEach
+
+      // Push jam scores for timeline
+      jamScoreHistory.push({ jamNum: jam.jam, t1: t1Score, t2: t2Score });
+
+      // Cross-team analysis: "points while opponent had lead (and hadn't lost it)"
+      // T1 had lead and didn't lose it → T2 scoring is "allowed while lead"
+      var tj1 = jam.teams['1'];
+      var tj2 = jam.teams['2'];
+      var lead1 = tj1 && isTrue(tj1.Lead);
+      var lead2 = tj2 && isTrue(tj2.Lead);
+      var lost1 = tj1 && isTrue(tj1.Lost);
+      var lost2 = tj2 && isTrue(tj2.Lost);
+      if (lead1 && !lost1 && t2Score > 0) {
+        teamStats['1'].allowedWhileLead += t2Score;
+        teamStats['2'].scoredVsLead += t2Score;
+      }
+      if (lead2 && !lost2 && t1Score > 0) {
+        teamStats['2'].allowedWhileLead += t1Score;
+        teamStats['1'].scoredVsLead += t1Score;
+      }
+    }); // end teamJams.forEach
 
     // Compute derived stats
     var jammerList = [];
@@ -384,7 +451,8 @@
     return {
       jammers: jammerList,
       teamStats: teamStats,
-      totalJams: totalJamsCount
+      totalJams: totalJamsCount,
+      jamScoreHistory: jamScoreHistory
     };
   }
 
@@ -410,13 +478,26 @@
       ? round1(ts1.totalScore / ts2.totalScore)
       : (ts1.totalScore > 0 ? '∞' : '—');
 
+    function stat(label, val1, val2, isScore) {
+      var b = isScore
+        ? '<span class="gs-value gs-t1">' + val1 + '</span><span class="gs-divider">:</span><span class="gs-value gs-t2">' + val2 + '</span>'
+        : '<span class="gs-value gs-t1">' + val1 + '</span><span class="gs-divider">|</span><span class="gs-value gs-t2">' + val2 + '</span>';
+      return '<div class="gs-stat"><span class="gs-label">' + label + '</span>' + b + '</div>';
+    }
+
     el.innerHTML =
       '<div class="gs-row">' +
-        '<div class="gs-stat"><span class="gs-label">Lead %</span><span class="gs-value gs-t1">' + leadPct1 + '%</span><span class="gs-divider">|</span><span class="gs-value gs-t2">' + leadPct2 + '%</span></div>' +
-        '<div class="gs-stat"><span class="gs-label">Lead</span><span class="gs-value gs-t1">' + ts1.leadCount + '</span><span class="gs-divider">|</span><span class="gs-value gs-t2">' + ts2.leadCount + '</span></div>' +
-        '<div class="gs-stat"><span class="gs-label">Score</span><span class="gs-value gs-t1">' + ts1.totalScore + '</span><span class="gs-divider">:</span><span class="gs-value gs-t2">' + ts2.totalScore + '</span></div>' +
-        '<div class="gs-stat"><span class="gs-label">PPJ</span><span class="gs-value gs-t1">' + ppj1 + '</span><span class="gs-divider">|</span><span class="gs-value gs-t2">' + ppj2 + '</span></div>' +
-        '<div class="gs-stat"><span class="gs-label">Ratio</span><span class="gs-value gs-ratio">' + ratio + '</span></div>' +
+        stat('Lead %', leadPct1 + '%', leadPct2 + '%') +
+        stat('Score', ts1.totalScore, ts2.totalScore, true) +
+        stat('Call-off', ts1.calloffCount, ts2.calloffCount) +
+        stat('Star Pass', ts1.starPassCount, ts2.starPassCount) +
+      '</div>' +
+      '<div class="gs-row">' +
+        stat('PPJ', ppj1, ppj2) +
+        stat('Lost Lead', ts1.lostCount, ts2.lostCount) +
+        stat('No Init', ts1.noInitialCount, ts2.noInitialCount) +
+        stat('Rat', ratio) +
+        stat('<span class="gs-tip" title="Points scored while opponent had lead and had not lost it. Shows poor lead-jammer awareness.">Opp Sc</span>', ts2.scoredVsLead, ts1.scoredVsLead) +
       '</div>';
   }
 
@@ -506,6 +587,121 @@
     }
   }
 
+  /* ── Score Timeline ── */
+
+  function renderScoreTimeline(history) {
+    var el = document.getElementById('score-timeline');
+    if (!el || !history || history.length === 0) return;
+
+    var maxVal = 1;
+    history.forEach(function (h) {
+      if (h.t1 > maxVal) maxVal = h.t1;
+      if (h.t2 > maxVal) maxVal = h.t2;
+    });
+
+    var html = '<div class="tl-container">';
+    history.forEach(function (h) {
+      var pct1 = (h.t1 / maxVal * 100).toFixed(1);
+      var pct2 = (h.t2 / maxVal * 100).toFixed(1);
+      var h1 = h.t1 > 0 ? pct1 : 2;
+      var h2 = h.t2 > 0 ? pct2 : 2;
+      html += '<div class="tl-col">' +
+        '<div class="tl-bar tl-t1" style="height:' + h1 + '%" title="Jam ' + h.jamNum + ': T1 scored ' + h.t1 + '">' +
+          (h.t1 > 0 ? '<span class="tl-val">' + h.t1 + '</span>' : '') +
+        '</div>' +
+        '<div class="tl-bar tl-t2" style="height:' + h2 + '%" title="Jam ' + h.jamNum + ': T2 scored ' + h.t2 + '">' +
+          (h.t2 > 0 ? '<span class="tl-val">' + h.t2 + '</span>' : '') +
+        '</div>' +
+        '<div class="tl-label">#' + h.jamNum + '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+
+    el.innerHTML = '<div class="tl-header">Score per Jam</div>' + html;
+  }
+
+  /* ── Penalty Snapshot ── */
+
+  function buildPenaltyData() {
+    var data = { '1': { total: 0, skaters: [] }, '2': { total: 0, skaters: [] } };
+
+    // Collect all skater penalty data
+    var re = new RegExp(
+      '^' + PREFIX.replace(/\./g, '\\.') +
+      '\\.Team\\((\\d+)\\)\\.Skater\\((\\d+)\\)\\.PenaltyCount$'
+    );
+    var names = {};
+    var nums = {};
+    Object.keys(WS.state).forEach(function (key) {
+      var m = key.match(re);
+      if (!m) return;
+      var team = m[1];
+      var idx = m[2];
+      var count = asNum(WS.state[key]);
+      if (count > 0) {
+        var nk = PREFIX + '.Team(' + team + ').Skater(' + idx + ').Name';
+        var rk = PREFIX + '.Team(' + team + ').Skater(' + idx + ').RosterNumber';
+        var codes = [];
+        // Collect penalty codes
+        var codeRe = new RegExp(
+          '^' + PREFIX.replace(/\./g, '\\.') +
+          '\\.Team\\(' + team + '\\)\\.Skater\\(' + idx + '\\)\\.Penalty\\((\\d+)\\)\\.Code$'
+        );
+        Object.keys(WS.state).forEach(function (k) {
+          var cm = k.match(codeRe);
+          if (cm) codes.push(WS.state[k]);
+        });
+        data[team].skaters.push({
+          idx: idx,
+          name: WS.state[nk] || 'Skater ' + idx,
+          number: WS.state[rk] || '?',
+          count: count,
+          codes: codes
+        });
+      }
+    });
+
+    // Sort by penalty count descending
+    [1, 2].forEach(function (t) {
+      data[t].skaters.sort(function (a, b) { return b.count - a.count; });
+      data[t].total = data[t].skaters.reduce(function (s, sk) { return s + sk.count; }, 0);
+      // Keep top 5
+      data[t].skaters = data[t].skaters.slice(0, 5);
+    });
+
+    return data;
+  }
+
+  function renderPenalties() {
+    var data = buildPenaltyData();
+
+    [1, 2].forEach(function (teamNum) {
+      var el = document.getElementById('penalties-' + teamNum);
+      if (!el) return;
+
+      var td = data[teamNum];
+      if (td.skaters.length === 0) {
+        el.innerHTML = '<div class="pen-empty">No penalties</div>';
+        return;
+      }
+
+      var rows = '';
+      td.skaters.forEach(function (s) {
+        var codeEmojis = s.codes.map(function (c) { return penEmoji(c); }).join(' ');
+        rows += '<div class="pen-row">' +
+          '<span class="pen-num">#' + escHtml(s.number) + '</span>' +
+          '<span class="pen-name">' + escHtml(s.name) + '</span>' +
+          '<span class="pen-count">' + s.count + '</span>' +
+          (codeEmojis ? '<span class="pen-codes">' + codeEmojis + '</span>' : '') +
+        '</div>';
+      });
+
+      el.innerHTML =
+        '<div class="pen-header">Penalties: ' + td.total + '</div>' +
+        '<div class="pen-list">' + rows + '</div>';
+    });
+  }
+
   /* ═══════════════════════════════════════════
    *  Master Render
    * ═══════════════════════════════════════════ */
@@ -545,6 +741,10 @@
     // Render per-team jammer tables
     renderJammerTable(1, null, stats.jammers, team1Score);
     renderJammerTable(2, null, stats.jammers, team2Score);
+
+    // Phase 2: Score timeline + penalty snapshots
+    renderScoreTimeline(stats.jamScoreHistory);
+    renderPenalties();
   }
 
   /* ═══════════════════════════════════════════
@@ -565,6 +765,7 @@
     PREFIX + '.Period(*).Jam(*).TeamJam(*).Lost',
     PREFIX + '.Period(*).Jam(*).TeamJam(*).StarPass',
     PREFIX + '.Period(*).Jam(*).TeamJam(*).Calloff',
+    PREFIX + '.Period(*).Jam(*).TeamJam(*).NoInitial',
     PREFIX + '.Period(*).Jam(*).TeamJam(*).TotalScore',
     PREFIX + '.Period(*).Jam(*).TeamJam(*).Fielding(*).Skater',
     PREFIX + '.Period(*).Jam(*).TeamJam(*).ScoringTrip(*).Score',
@@ -575,6 +776,13 @@
   WS.Register([
     PREFIX + '.Team(*).Skater(*).Name',
     PREFIX + '.Team(*).Skater(*).RosterNumber'
+  ], queueRender);
+
+  // Penalty data
+  WS.Register([
+    PREFIX + '.Team(*).TotalPenalties',
+    PREFIX + '.Team(*).Skater(*).PenaltyCount',
+    PREFIX + '.Team(*).Skater(*).Penalty(*).Code'
   ], queueRender);
 
   /* ── Initial Render ── */

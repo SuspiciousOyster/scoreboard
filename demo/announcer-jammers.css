@@ -441,3 +441,157 @@ body.preload * {
     padding: 6px 10px;
   }
 }
+
+/* ═══════════════════════════════════════════
+ *  Score Timeline
+ * ═══════════════════════════════════════════ */
+
+.score-timeline {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: var(--gap);
+}
+
+.tl-header {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.tl-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 120px;
+}
+
+.tl-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  min-width: 16px;
+}
+
+.tl-bar {
+  width: 100%;
+  min-height: 2px;
+  border-radius: 2px 2px 0 0;
+  position: relative;
+  transition: height 0.3s ease;
+}
+
+.tl-t1 {
+  background: var(--team1-color);
+  opacity: 0.85;
+  margin-bottom: 2px;
+}
+
+.tl-t2 {
+  background: var(--team2-color);
+  opacity: 0.85;
+}
+
+.tl-val {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.tl-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════
+ *  Penalty Snapshot
+ * ═══════════════════════════════════════════ */
+
+.team-penalties {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 10px 16px;
+}
+
+.pen-header {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 8px;
+}
+
+.pen-empty {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: var(--font-size-sm);
+  padding: 4px 0;
+}
+
+.pen-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pen-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+}
+
+.pen-num {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.pen-name {
+  font-weight: 500;
+}
+
+.pen-count {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-left: 4px;
+}
+
+.pen-codes {
+  font-size: 14px;
+  line-height: 1;
+  margin-left: 2px;
+}
+
+/* ═══════════════════════════════════════════
+ *  Game Stats Tooltip
+ * ═══════════════════════════════════════════ */
+
+.gs-tip {
+  border-bottom: 1px dashed var(--text-muted);
+  cursor: help;
+}
