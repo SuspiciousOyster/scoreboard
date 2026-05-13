@@ -327,10 +327,47 @@ body.preload * {
   color: var(--accent);
 }
 
+/* Column group: Lead metrics (J, L, L%) — subtle tint */
+.jammer-table thead th:nth-child(4),
+.jammer-table thead th:nth-child(5),
+.jammer-table thead th:nth-child(6) {
+  background: rgba(88, 166, 255, 0.06);
+}
+
+.jammer-table tbody td:nth-child(4),
+.jammer-table tbody td:nth-child(5),
+.jammer-table tbody td:nth-child(6) {
+  background: rgba(88, 166, 255, 0.03);
+}
+
+/* Column group: Scoring metrics (Tot, PPJ, %T) — warm tint */
+.jammer-table thead th:nth-child(7),
+.jammer-table thead th:nth-child(8),
+.jammer-table thead th:nth-child(9) {
+  background: rgba(248, 81, 73, 0.06);
+  color: var(--text-secondary);
+}
+
+.jammer-table tbody td:nth-child(7),
+.jammer-table tbody td:nth-child(8),
+.jammer-table tbody td:nth-child(9) {
+  background: rgba(248, 81, 73, 0.02);
+}
+
+/* Set column widths for better alignment */
+.jammer-table thead th:nth-child(1) { width: 50px; }
+.jammer-table thead th:nth-child(2) { width: 120px; }
+.jammer-table thead th:nth-child(3) { min-width: 140px; }
+.jammer-table thead th:nth-child(4) { width: 36px; }
+.jammer-table thead th:nth-child(5) { width: 36px; }
+.jammer-table thead th:nth-child(6) { width: 44px; }
+.jammer-table thead th:nth-child(7) { width: 50px; }
+.jammer-table thead th:nth-child(8) { width: 50px; }
+.jammer-table thead th:nth-child(9) { width: 50px; }
+
 /* Highlight total score column */
 .jammer-table tbody td:nth-child(7) {
   font-weight: 700;
-  color: var(--text-primary);
 }
 
 /* ── Star Pass Badge ── */
@@ -585,6 +622,19 @@ body.preload * {
   font-size: 14px;
   line-height: 1;
   margin-left: 2px;
+}
+
+.pen-emoji {
+  cursor: help;
+  display: inline-block;
+  margin: 0 1px;
+  padding: 1px 2px;
+  border-radius: 3px;
+  transition: background 0.15s;
+}
+
+.pen-emoji:hover {
+  background: var(--accent-subtle);
 }
 
 /* ═══════════════════════════════════════════

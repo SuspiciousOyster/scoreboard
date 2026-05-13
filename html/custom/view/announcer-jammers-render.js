@@ -624,49 +624,69 @@
 
   function buildPenaltyData() {
     var data = { '1': { total: 0, skaters: [] }, '2': { total: 0, skaters: [] } };
+    var seen = {}; // "team:idx" → { count, codes }
 
-    // Collect all skater penalty data
-    var re = new RegExp(
-      '^' + PREFIX.replace(/\./g, '\\.') +
-      '\\.Team\\((\\d+)\\)\\.Skater\\((\\d+)\\)\\.PenaltyCount$'
-    );
-    var names = {};
-    var nums = {};
+    // Scan all Penalty(N).Code entries to find skaters with penalties
     Object.keys(WS.state).forEach(function (key) {
-      var m = key.match(re);
+      var m = key.match(new RegExp(
+        '^' + PREFIX.replace(/\./g, '\\.') +
+        '\\.Team\\((\\d+)\\)\\.Skater\\((\\d+)\\)\\.Penalty\\((\\d+)\\)\\.Code$'
+      ));
       if (!m) return;
       var team = m[1];
       var idx = m[2];
-      var count = asNum(WS.state[key]);
-      if (count > 0) {
-        var nk = PREFIX + '.Team(' + team + ').Skater(' + idx + ').Name';
-        var rk = PREFIX + '.Team(' + team + ').Skater(' + idx + ').RosterNumber';
-        var codes = [];
-        // Collect penalty codes
-        var codeRe = new RegExp(
-          '^' + PREFIX.replace(/\./g, '\\.') +
-          '\\.Team\\(' + team + '\\)\\.Skater\\(' + idx + '\\)\\.Penalty\\((\\d+)\\)\\.Code$'
-        );
-        Object.keys(WS.state).forEach(function (k) {
-          var cm = k.match(codeRe);
-          if (cm) codes.push(WS.state[k]);
-        });
-        data[team].skaters.push({
-          idx: idx,
-          name: WS.state[nk] || 'Skater ' + idx,
-          number: WS.state[rk] || '?',
-          count: count,
-          codes: codes
-        });
+      var code = WS.state[key];
+      if (!code) return;
+      var keyId = team + ':' + idx;
+      if (!seen[keyId]) {
+        seen[keyId] = { count: 0, codes: [] };
+      }
+      seen[keyId].count++;
+      seen[keyId].codes.push(code);
+    });
+
+    // Also check PenaltyCount values (may be set independently)
+    Object.keys(WS.state).forEach(function (key) {
+      var m = key.match(new RegExp(
+        '^' + PREFIX.replace(/\./g, '\\.') +
+        '\\.Team\\((\\d+)\\)\\.Skater\\((\\d+)\\)\\.PenaltyCount$'
+      ));
+      if (!m) return;
+      var team = m[1];
+      var idx = m[2];
+      var cnt = asNum(WS.state[key]);
+      var keyId = team + ':' + idx;
+      if (cnt > 0 && !seen[keyId]) {
+        seen[keyId] = { count: 0, codes: [] };
+      }
+      // Use the larger of the two counts
+      if (cnt > seen[keyId].count) {
+        seen[keyId].count = cnt;
       }
     });
 
-    // Sort by penalty count descending
+    // Build output for each team
     [1, 2].forEach(function (t) {
-      data[t].skaters.sort(function (a, b) { return b.count - a.count; });
-      data[t].total = data[t].skaters.reduce(function (s, sk) { return s + sk.count; }, 0);
-      // Keep top 5
-      data[t].skaters = data[t].skaters.slice(0, 5);
+      var tn = String(t);
+      data[tn].total = 0;
+      Object.keys(seen).forEach(function (keyId) {
+        if (!keyId.startsWith(tn + ':')) return;
+        var idx = keyId.split(':')[1];
+        var info = seen[keyId];
+        var nk = PREFIX + '.Team(' + tn + ').Skater(' + idx + ').Name';
+        var rk = PREFIX + '.Team(' + tn + ').Skater(' + idx + ').RosterNumber';
+        data[tn].skaters.push({
+          idx: idx,
+          name: WS.state[nk] || 'Skater ' + idx,
+          number: WS.state[rk] || '?',
+          count: info.count,
+          codes: info.codes
+        });
+        data[tn].total += info.count;
+      });
+
+      data[tn].skaters.sort(function (a, b) { return b.count - a.count; });
+      data[tn].skaters = data[tn].skaters.slice(0, 5);
     });
 
     return data;
@@ -687,7 +707,9 @@
 
       var rows = '';
       td.skaters.forEach(function (s) {
-        var codeEmojis = s.codes.map(function (c) { return penEmoji(c); }).join(' ');
+        var codeEmojis = s.codes.map(function (c) {
+          return '<span class="pen-emoji" title="' + escHtml(c) + '">' + penEmoji(c) + '</span>';
+        }).join(' ');
         rows += '<div class="pen-row">' +
           '<span class="pen-num">#' + escHtml(s.number) + '</span>' +
           '<span class="pen-name">' + escHtml(s.name) + '</span>' +
