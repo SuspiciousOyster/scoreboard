@@ -406,13 +406,19 @@
       '</table>';
   }
 
-  function renderTeamName(teamNum) {
-    var el = document.getElementById('team-name-' + teamNum);
-    if (!el) return;
-    var altKey = PREFIX + '.Team(' + teamNum + ').AlternateName(operator)';
-    var nameKey = PREFIX + '.Team(' + teamNum + ').Name';
-    var name = WS.state[altKey] || WS.state[nameKey] || 'Team ' + teamNum;
-    el.textContent = name;
+  function renderTeamHeader(teamNum) {
+    var nameEl = document.getElementById('team-name-' + teamNum);
+    if (nameEl) {
+      var altKey = PREFIX + '.Team(' + teamNum + ').AlternateName(operator)';
+      var nameKey = PREFIX + '.Team(' + teamNum + ').Name';
+      var name = WS.state[altKey] || WS.state[nameKey] || 'Team ' + teamNum;
+      nameEl.textContent = name;
+    }
+    // Update team score in section header (used by both game-day view and demo)
+    var scoreEl = document.getElementById('team-score-' + teamNum);
+    if (scoreEl) {
+      scoreEl.textContent = asNum(getPath('Team(' + teamNum + ').Score'));
+    }
   }
 
   /* ═══════════════════════════════════════════
@@ -441,7 +447,7 @@
     var stats = computeAllStats();
 
     // Update team names
-    [1, 2].forEach(function (num) { renderTeamName(num); });
+    [1, 2].forEach(function (num) { renderTeamHeader(num); });
 
     // Update game stats header
     renderGameStats(stats);
