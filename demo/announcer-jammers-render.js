@@ -172,7 +172,7 @@
           jamsSP: 0,           // jams where they received star pass
           leadCount: 0,
           totalScore: 0,
-          lapScores: []        // array of per-scoring-pass values (flattened across jams)
+          lapScoresPerJam: []    // array of arrays: each inner array is one jam's scoring passes
         };
       }
       return jammers[key];
@@ -267,8 +267,8 @@
         jam1.jamsTotal++;
         jam1.jamsStarted++;
         jam1.totalScore += startPoints;
-        if (startPoints > 0) {
-          preSPTrips.forEach(function (p) { jam1.lapScores.push(p); });
+        if (preSPTrips.length > 0) {
+          jam1.lapScoresPerJam.push(preSPTrips);
         }
         if (isLead) jam1.leadCount++;
 
@@ -280,8 +280,8 @@
           jam2.jamsTotal++;
           jam2.jamsSP++;
           jam2.totalScore += spPoints;
-          if (spPoints > 0) {
-            postSPTrips.forEach(function (p) { jam2.lapScores.push(p); });
+          if (postSPTrips.length > 0) {
+            jam2.lapScoresPerJam.push(postSPTrips);
           }
           // Star pass recipient cannot be lead
         }
@@ -364,10 +364,13 @@
         spInd = ' <span class="sp-badge" title="Includes star-pass pickups">SP</span>';
       }
 
-      // Build lap scores display
+      // Build lap scores display — per-jam groups: [4,3] [1,5] [2,2,1]
       var lapStr = '';
-      if (j.lapScores.length > 0) {
-        lapStr = j.lapScores.map(function (s) { return s; }).join(', ');
+      if (j.lapScoresPerJam.length > 0) {
+        var groups = j.lapScoresPerJam.map(function (jamTrips) {
+          return '[' + jamTrips.join(',') + ']';
+        });
+        lapStr = groups.join(' ');
       } else {
         lapStr = j.totalScore > 0 ? String(j.totalScore) : '—';
       }
