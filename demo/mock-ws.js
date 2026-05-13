@@ -153,7 +153,8 @@
       team2: { jammer: 4, leading: false, scoringTrips: [2, 1] }
     },
     {
-      team1: { jammer: 1, leading: false, scoringTrips: [] },
+      // Star pass demo: Smash starts, does 2 passes, passes to Blitz who does 3
+      team1: { jammer: 1, leading: false, scoringTrips: [2, 2], starPassTo: 2, afterSPTrips: [1, 2, 1] },
       team2: { jammer: 3, leading: true, scoringTrips: [4, 2, 1] }
     }
   ];

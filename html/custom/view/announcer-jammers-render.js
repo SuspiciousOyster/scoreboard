@@ -235,55 +235,46 @@
           return parseInt(a, 10) - parseInt(b, 10);
         });
 
-        var preSPTrips = [];
-        var postSPTrips = [];
-
+        // Build structured trip list — each trip tracks score + afterSP flag
+        var allTripObjects = [];
         tripKeys.forEach(function (idx) {
           var trip = scoringTrips[idx];
-          var score = asNum(trip.Score);
-          var afterSP = isTrue(trip.AfterSP);
-          if (afterSP) {
-            postSPTrips.push(score);
-          } else {
-            preSPTrips.push(score);
-          }
+          allTripObjects.push({
+            score: asNum(trip.Score),
+            afterSP: isTrue(trip.AfterSP)
+          });
         });
 
-        // Pre-star-pass points and lap scores go to starting jammer
-        var startPoints = 0;
-        preSPTrips.forEach(function (p) { startPoints += p; });
-
-        // Post-star-pass points go to the star pass recipient
-        var spPoints = 0;
-        postSPTrips.forEach(function (p) { spPoints += p; });
-
-        // If jamScore is nonzero but no scoring trips found, attribute all to starting jammer
-        if (jamScore > 0 && preSPTrips.length === 0 && postSPTrips.length === 0) {
-          startPoints = jamScore;
+        // If jamScore is nonzero but no scoring trips found, create a single trip
+        if (jamScore > 0 && allTripObjects.length === 0) {
+          allTripObjects.push({ score: jamScore, afterSP: false });
         }
 
-        // Update starting jammer
+        // Sum all points for the starting jammer
+        var startPoints = 0;
+        allTripObjects.forEach(function (t) { startPoints += t.score; });
+
+        // Update starting jammer — ALL trips go here, post-SP ones marked with *
         var jam1 = ensureJammer(teamNum, startRef, startInfo);
         jam1.jamsTotal++;
         jam1.jamsStarted++;
         jam1.totalScore += startPoints;
-        if (preSPTrips.length > 0) {
-          jam1.lapScoresPerJam.push(preSPTrips);
+        if (allTripObjects.length > 0) {
+          jam1.lapScoresPerJam.push(allTripObjects);
         }
         if (isLead) jam1.leadCount++;
 
-        // Handle star pass recipient
+        // Handle star pass recipient — counted as having been jammer,
+        // but ALL points from this jam attribute to the starting jammer.
+        // The SP recipient gets jamsTotal++ and jamsSP++ for badge visibility
+        // but no points or lap scores (those show under the starter's row).
         if (starPass && jammerRefs.length > 1) {
           var spRef = jammerRefs[1];
           var spInfo = resolveSkater(spRef, skaterMap);
           var jam2 = ensureJammer(teamNum, spRef, spInfo);
           jam2.jamsTotal++;
           jam2.jamsSP++;
-          jam2.totalScore += spPoints;
-          if (postSPTrips.length > 0) {
-            jam2.lapScoresPerJam.push(postSPTrips);
-          }
-          // Star pass recipient cannot be lead
+          // Points attribute to the starting jammer, not the SP recipient
         }
 
         // If no fielding entries at all but jamScore > 0, attribute to unknown
@@ -364,11 +355,15 @@
         spInd = ' <span class="sp-badge" title="Includes star-pass pickups">SP</span>';
       }
 
-      // Build lap scores display — per-jam groups: [4,3] [1,5] [2,2,1]
+      // Build lap scores display — per-jam groups: [4,3] [1,5,2*] [2,2,1]
+      // Post-star-pass trips get a * suffix
       var lapStr = '';
       if (j.lapScoresPerJam.length > 0) {
         var groups = j.lapScoresPerJam.map(function (jamTrips) {
-          return '[' + jamTrips.join(',') + ']';
+          var parts = jamTrips.map(function (t) {
+            return t.score + (t.afterSP ? '*' : '');
+          });
+          return '[' + parts.join(',') + ']';
         });
         lapStr = groups.join(' ');
       } else {

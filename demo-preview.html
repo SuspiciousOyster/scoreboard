@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Announcer Stats Demo (Mock)</title>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet" href="html/custom/view/announcer-stats.css">
+  <style>
+    body { padding: 20px; background: #1a1a2e; }
+    .note { color: #888; text-align: center; margin-bottom: 20px; font-family: sans-serif; font-size: 0.85em; }
+    .note strong { color: #e94560; }
+  </style>
+  <!-- Mock WS global and utilities -->
+  <script>
+    // Mock _timeConversions
+    var _timeConversions = {
+      msToMinSec: function(ms) {
+        var totalSec = Math.max(0, Math.floor((parseInt(ms,10)||0) / 1000));
+        var m = Math.floor(totalSec / 60);
+        var s = totalSec % 60;
+        return m + ':' + (s < 10 ? '0' : '') + s;
+      }
+    };
+
+    // Mock WS
+    var WS = {
+      state: {},
+      _callbacks: [],
+      Register: function(paths, cb) {
+        if (typeof paths === 'string') paths = [paths];
+        if (cb) this._callbacks.push({paths: paths, cb: cb});
+      },
+      AfterLoad: function(cb) { setTimeout(cb, 100); }
+    };
+
+    // Mock isTrue
+    function isTrue(v) {
+      return v === true || v === 'true' || v === 1 || v === '1';
+    }
+
+    // Populate mock state — full game data for all 6 sections
+    function populateMockState() {
+      var s = WS.state;
+      var P = 'ScoreBoard.CurrentGame';
+
+      // Team 1 — "Thunderbirds"
+      s[P + '.Team(1).Name'] = 'Thunderbirds';
+      s[P + '.Team(1).AlternateName(operator)'] = 'THUNDER';
+      s[P + '.Team(1).Score'] = '98';
+      s[P + '.Team(1).JamScore'] = '12';
+      s[P + '.Team(1).Timeouts'] = '2';
+      s[P + '.Team(1).OfficialReviews'] = '1';
+      s[P + '.Team(1).Color(overlay.bg)'] = '#e63946';
+      s[P + '.Team(1).Color(overlay.fg)'] = '#ffffff';
+      s[P + '.Team(1).TotalPenalties'] = '12';
+
+      // Team 2 — "Valkyries"
+      s[P + '.Team(2).Name'] = 'Valkyries';
+      s[P + '.Team(2).AlternateName(operator)'] = 'VALKYRIE';
+      s[P + '.Team(2).Score'] = '84';
+      s[P + '.Team(2).JamScore'] = '7';
+      s[P + '.Team(2).Timeouts'] = '1';
+      s[P + '.Team(2).OfficialReviews'] = '0';
+      s[P + '.Team(2).Color(overlay.bg)'] = '#1d3557';
+      s[P + '.Team(2).Color(overlay.fg)'] = '#ffffff';
+      s[P + '.Team(2).TotalPenalties'] = '18';
+
+      // Clock state — currently In Jam
+      s[P + '.InJam'] = 'true';
+      s[P + '.Clock(Timeout).Running'] = 'false';
+      s[P + '.Clock(Lineup).Running'] = 'false';
+      s[P + '.Clock(Intermission).Running'] = 'false';
+      s[P + '.Clock(Period).Time'] = '1523000';  // ~25:23
+      s[P + '.Clock(Jam).Time'] = '89400';       // ~1:29
+      s[P + '.Clock(Period).Name'] = 'Period';
+      s[P + '.Clock(Jam).Name'] = 'Jam';
+      s[P + '.TimeoutOwner'] = '';
+      s[P + '.OfficialReview'] = 'false';
+      s[P + '.OfficialScore'] = 'false';
+      s[P + '.ClockDuringFinalScore'] = 'false';
+      s[P + '.Rule(Period.Number)'] = '2';
+
+      // Period 1 Jams — Team 1 TeamJam data
+      var jamData = [
+        // [period, jam, t1Score, t1Lead, t1Lost, t1SP, t1Calloff, t1Total, t2Score, t2Lead, t2Lost, t2SP, t2Calloff, t2Total]
+        [1,1, 5,1,0,0,0, 5,  2,0,1,0,0, 2],
+        [1,2, 4,1,0,0,0, 9,  3,0,0,0,0, 5],
+        [1,3, 0,0,1,0,1, 9,  4,0,0,0,0, 9],
+        [1,4, 3,1,0,0,0, 12, 0,0,0,1,0, 9],
+        [1,5, 2,0,0,1,0, 14, 4,1,0,0,0, 13],
+        [1,6, 4,1,0,0,0, 18, 1,0,1,0,0, 14],
+        [1,7, 5,0,0,0,1, 23, 5,1,0,0,0, 19],
+        [1,8, 1,1,0,0,0, 24, 0,0,0,0,0, 19],
+        [1,9, 4,0,0,0,0, 28, 4,1,0,0,0, 23],
+        [1,10,3,1,0,0,0, 31, 2,0,0,0,0, 25],
+        [1,11,2,0,0,0,0, 33, 3,1,0,0,0, 28],
+        [1,12,4,1,0,0,0, 37, 1,0,0,0,1, 29],
+        [1,13,1,0,1,0,0, 38, 4,0,0,0,0, 33],
+        [1,14,3,0,0,1,0, 41, 3,1,0,0,0, 36],
+        [1,15,2,1,0,0,0, 43, 1,0,0,0,0, 37],
+        [1,16,4,1,0,0,0, 47, 2,0,0,0,0, 39],
+        [1,17,5,0,0,0,1, 52, 5,1,0,0,0, 44],
+        [1,18,2,1,0,0,0, 54, 1,0,0,0,0, 45],
+        [1,19,3,0,0,0,0, 57, 3,1,0,0,0, 48],
+        [1,20,4,1,0,0,0, 61, 2,0,0,0,0, 50],
+        // Period 2 jams
+        [2,1, 5,1,0,0,0, 66, 3,0,0,0,0, 53],
+        [2,2, 3,0,0,0,0, 69, 4,1,0,0,0, 57],
+        [2,3, 2,1,0,0,0, 71, 1,0,0,0,0, 58],
+        [2,4, 4,1,0,0,0, 75, 2,0,0,0,0, 60],
+        [2,5, 1,0,1,0,0, 76, 3,0,0,0,0, 63],
+        [2,6, 3,1,0,0,0, 79, 1,0,1,0,0, 64],
+        [2,7, 2,0,0,0,0, 81, 4,1,0,0,0, 68],
+        [2,8, 4,1,0,0,0, 85, 1,0,0,0,0, 69],
+        [2,9, 1,0,0,0,0, 86, 3,1,0,0,0, 72],
+        [2,10,12,1,0,0,0, 98, 7,0,0,0,0, 79],
+        [2,11,0,0,0,0,0, 98, 5,1,0,0,0, 84],
+      ];
+
+      jamData.forEach(function(j) {
+        var per = j[0], jam = j[1];
+        var t1Score = j[2], t1Lead = j[3], t1Lost = j[4], t1SP = j[5], t1Calloff = j[6], t1Total = j[7];
+        var t2Score = j[8], t2Lead = j[9], t2Lost = j[10], t2SP = j[11], t2Calloff = j[12], t2Total = j[13];
+
+        function setTJ(t, field, v) {
+          s[P + '.Period(' + per + ').Jam(' + jam + ').TeamJam(' + t + ').' + field] = v;
+        }
+        setTJ(1, 'JamScore', t1Score);
+        setTJ(1, 'Lead', t1Lead ? 'true' : 'false');
+        setTJ(1, 'Lost', t1Lost ? 'true' : 'false');
+        setTJ(1, 'StarPass', t1SP ? 'true' : 'false');
+        setTJ(1, 'Calloff', t1Calloff ? 'true' : 'false');
+        setTJ(1, 'TotalScore', t1Total);
+        setTJ(2, 'JamScore', t2Score);
+        setTJ(2, 'Lead', t2Lead ? 'true' : 'false');
+        setTJ(2, 'Lost', t2Lost ? 'true' : 'false');
+        setTJ(2, 'StarPass', t2SP ? 'true' : 'false');
+        setTJ(2, 'Calloff', t2Calloff ? 'true' : 'false');
+        setTJ(2, 'TotalScore', t2Total);
+
+        // Fielding — assign some jammers
+        var t1Jammers = ['Skater(1)', 'Skater(3)', 'Skater(5)'];
+        var t2Jammers = ['Skater(2)', 'Skater(4)', 'Skater(6)'];
+        var j1 = t1Jammers[jam % 3];
+        var j2 = t2Jammers[(jam+1) % 3];
+        s[P + '.Period(' + per + ').Jam(' + jam + ').TeamJam(1).Fielding(Jammer).Skater'] = j1;
+        s[P + '.Period(' + per + ').Jam(' + jam + ').TeamJam(2).Fielding(Jammer).Skater'] = j2;
+      });
+
+      // Skaters + penalties
+      var skaters = [
+        {team:1, idx:1, name:'Rocket', num:'07', pc:2, codes:['I','M']},
+        {team:1, idx:2, name:'Blitz', num:'23', pc:1, codes:['M']},
+        {team:1, idx:3, name:'Ace', num:'13', pc:4, codes:['I','C','M','P']},
+        {team:1, idx:4, name:'Phoenix', num:'42', pc:0, codes:[]},
+        {team:1, idx:5, name:'Shadow', num:'88', pc:3, codes:['B','M','I']},
+        {team:1, idx:6, name:'Storm', num:'99', pc:0, codes:[]},
+        {team:2, idx:1, name:'Fury', num:'11', pc:5, codes:['H','I','M','I','B']},
+        {team:2, idx:2, name:'Viper', num:'37', pc:3, codes:['C','I','M']},
+        {team:2, idx:3, name:'Raven', num:'04', pc:2, codes:['M','B']},
+        {team:2, idx:4, name:'Siren', num:'69', pc:4, codes:['M','C','I','P']},
+        {team:2, idx:5, name:'Titan', num:'00', pc:6, codes:['I','I','M','B','C','I']},
+        {team:2, idx:6, name:'Wraith', num:'17', pc:1, codes:['M']},
+      ];
+
+      skaters.forEach(function(sk) {
+        var base = P + '.Team(' + sk.team + ').Skater(' + sk.idx + ')';
+        s[base + '.Name'] = sk.name;
+        s[base + '.RosterNumber'] = sk.num;
+        s[base + '.PenaltyCount'] = sk.pc.toString();
+        sk.codes.forEach(function(code, pi) {
+          s[base + '.Penalty(' + pi + ').Code'] = code;
+        });
+      });
+    }
+
+    populateMockState();
+  </script>
+</head>
+<body>
+  <div class="note">
+    ⚡ <strong>Announcer Stats Demo</strong> — Mocked game data for preview. Open dev tools to see the rendered DOM.
+  </div>
+  <div class="announcer-dashboard" id="demo-root"></div>
+
+  <script>
+    // Inject the dashboard into the demo-root div
+    // Copy the HTML from announcer-stats.html inline
+    document.getElementById('demo-root').innerHTML = [
+      '<section id="game-header" class="dashboard-section game-header"></section>',
+      '<section class="dashboard-section"><h2>Team Stats</h2><div id="team-stats" class="section-content"><div class="loading-message">Loading team stats...</div></div></section>',
+      '<section class="dashboard-section"><h2>Penalty Leaders</h2><div id="penalty-leaders" class="section-content"><div class="loading-message">Loading penalty data...</div></div></section>',
+      '<section class="dashboard-section"><h2>Jammer Performance</h2><div id="jammer-performance" class="section-content"><div class="loading-message">Loading jammer data...</div></div></section>',
+      '<section class="dashboard-section"><h2>Jam Log (Last 15)</h2><div id="jam-log" class="section-content"><div class="loading-message">Loading jam log...</div></div></section>',
+      '<section class="dashboard-section"><h2>Penalty Code Breakdown</h2><div id="penalty-breakdown" class="section-content"><div class="loading-message">Loading penalty breakdown...</div></div></section>'
+    ].join('');
+  </script>
+
+  <!-- The actual announcer-stats.js — rendered live with mock data -->
+  <script type="text/javascript" src="html/custom/view/announcer-stats.js"></script>
+</body>
+</html>
