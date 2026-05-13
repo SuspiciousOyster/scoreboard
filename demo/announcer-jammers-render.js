@@ -215,7 +215,7 @@
           var f = fielding[key];
           if (!f.Skater || !f.Skater.trim()) return;
           var pos = (f.Position || '').trim();
-          if (pos === 'Jammer') {
+          if (pos === 'Jammer' || pos.endsWith('_Jammer') || pos.includes('Jammer')) {
             jammerRefs.push(f.Skater.trim());
             if (!foundJammer) foundJammer = true;
           }
