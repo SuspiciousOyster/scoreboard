@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Announcer Jammers | CRG ScoreBoard</title>
+
+    <!--
+      Announcer Jammers View — Custom View for CRG ScoreBoard
+      Displays per-jammer performance stats for roller derby announcers:
+        - Per-jammer table: roster #, name, lap scores, jams, lead,
+          lead%, total score, PPJ, % of team score
+        - Game stats header: lead%, lead count, score, PPJ, ratio
+
+      Part of the SuspiciousOyster ScoreBoard custom views suite.
+      Licensed under the GNU General Public License v3 or later, or Apache 2.0.
+    -->
+
+    <script type="text/javascript" src="/external/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/json/core.js"></script>
+
+    <link rel="stylesheet" href="announcer-jammers.css" type="text/css" />
+  </head>
+  <body class="preload">
+    <div class="announcer-jammers">
+
+      <!-- Connection Status -->
+      <div id="connection-status" class="connection-status">Connecting to ScoreBoard…</div>
+
+      <!-- Game Stats Header -->
+      <div id="game-stats" class="game-stats-header">
+        <div class="empty-message">Waiting for game data…</div>
+      </div>
+
+      <!-- Team 1 Section -->
+      <section class="team-section">
+        <div class="team-header" id="team-header-1">
+          <span class="team-name" id="team-name-1">Team 1</span>
+          <span class="team-score-display">Score: <strong id="team-score-1">0</strong></span>
+        </div>
+        <div class="team-table-wrapper">
+          <div id="jammer-table-1">
+            <div class="empty-message">Waiting for jammer data…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Team 2 Section -->
+      <section class="team-section">
+        <div class="team-header" id="team-header-2">
+          <span class="team-name" id="team-name-2">Team 2</span>
+          <span class="team-score-display">Score: <strong id="team-score-2">0</strong></span>
+        </div>
+        <div class="team-table-wrapper">
+          <div id="jammer-table-2">
+            <div class="empty-message">Waiting for jammer data…</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <script type="text/javascript" src="announcer-jammers-render.js"></script>
+    <script type="text/javascript">
+      // Update team score displays in the header as they change
+      (function () {
+        'use strict';
+        var PREFIX = 'ScoreBoard.CurrentGame';
+        function updateTeamScores() {
+          var s1 = document.getElementById('team-score-1');
+          var s2 = document.getElementById('team-score-2');
+          if (s1) s1.textContent = parseInt(WS.state[PREFIX + '.Team(1).Score'] || '0', 10);
+          if (s2) s2.textContent = parseInt(WS.state[PREFIX + '.Team(2).Score'] || '0', 10);
+        }
+        WS.Register(PREFIX + '.Team(*).Score', updateTeamScores);
+        WS.AfterLoad(updateTeamScores);
+      })();
+    </script>
+  </body>
+</html>

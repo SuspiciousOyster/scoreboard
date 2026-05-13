@@ -1,0 +1,323 @@
+/* ═══════════════════════════════════════════
+ * Announcer Jammers View — Styles
+ *
+ * Dark theme with CSS custom properties.
+ * To restyle for game-day branding, change the
+ * values in :root — no need to touch selectors.
+ * ═══════════════════════════════════════════ */
+
+/* ── Theme Variables ── */
+:root {
+  /* Core background & text */
+  --bg-page: #0d1117;
+  --bg-card: #161b22;
+  --bg-card-alt: #1c2333;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #484f58;
+
+  /* Accent */
+  --accent: #58a6ff;
+  --accent-subtle: rgba(88, 166, 255, 0.15);
+  --border: #30363d;
+  --border-accent: #58a6ff;
+
+  /* Status */
+  --lead-color: #3fb950;
+  --lead-bg: rgba(63, 185, 80, 0.12);
+
+  /* Team colours (used when CRG scoreboard colours aren't available) */
+  --team1-bg: #1f6feb;
+  --team1-fg: #ffffff;
+  --team2-bg: #da3633;
+  --team2-fg: #ffffff;
+
+  /* Table */
+  --table-header-bg: #21262d;
+  --table-row-hover: #1c2128;
+  --table-border: #30363d;
+
+  /* Typography */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  --font-mono: 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, monospace;
+  --font-size-base: 14px;
+  --font-size-sm: 12px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+
+  /* Layout */
+  --gap: 16px;
+  --radius: 8px;
+  --radius-sm: 4px;
+}
+
+/* ── Reset ── */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+body.preload * {
+  transition: none !important;
+}
+
+/* ── Connection Status ── */
+.connection-status {
+  text-align: center;
+  padding: 4px 8px;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Layout Container ── */
+.announcer-jammers {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--gap);
+}
+
+/* ═══════════════════════════════════════════
+ *  Game Stats Header
+ * ═══════════════════════════════════════════ */
+
+.game-stats-header {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  margin-bottom: var(--gap);
+}
+
+.gs-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.gs-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-card-alt);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.gs-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.gs-value {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  min-width: 28px;
+  text-align: center;
+}
+
+.gs-divider {
+  color: var(--text-muted);
+  font-weight: 300;
+  margin: 0 2px;
+}
+
+.gs-ratio {
+  color: var(--accent);
+}
+
+/* ═══════════════════════════════════════════
+ *  Team Section
+ * ═══════════════════════════════════════════ */
+
+.team-section {
+  margin-bottom: var(--gap);
+}
+
+.team-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius) var(--radius) 0 0;
+  border-bottom: none;
+}
+
+.team-header .team-name {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+}
+
+.team-header .team-score-display {
+  font-size: var(--font-size-lg);
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.team-header .team-score-display strong {
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+}
+
+.team-table-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0 0 var(--radius) var(--radius);
+  overflow-x: auto;
+}
+
+/* ═══════════════════════════════════════════
+ *  Jammer Table
+ * ═══════════════════════════════════════════ */
+
+.jammer-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-base);
+}
+
+.jammer-table thead {
+  background: var(--table-header-bg);
+}
+
+.jammer-table thead th {
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+
+.jammer-table thead th[title] {
+  cursor: help;
+}
+
+.jammer-table tbody tr {
+  border-bottom: 1px solid var(--table-border);
+  transition: background 0.15s ease;
+}
+
+.jammer-table tbody tr:hover {
+  background: var(--table-row-hover);
+}
+
+.jammer-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.jammer-table tbody td {
+  padding: 8px 10px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* ── Column Styles ── */
+
+.j-num {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--accent);
+  width: 60px;
+}
+
+.j-name {
+  font-weight: 600;
+  min-width: 120px;
+}
+
+.j-laps {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.j-val {
+  font-family: var(--font-mono);
+  text-align: right;
+  min-width: 40px;
+}
+
+.jammer-table thead th.j-val {
+  text-align: right;
+}
+
+/* ── Star Pass Badge ── */
+.sp-badge {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  margin-left: 4px;
+  vertical-align: middle;
+  line-height: 1.2;
+}
+
+/* ── Lead Highlight ── */
+.lead-highlight {
+  color: var(--lead-color);
+  font-weight: 700;
+}
+
+/* ── Empty State ── */
+.empty-message {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════
+ *  Responsive
+ * ═══════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  .jammer-table {
+    font-size: var(--font-size-sm);
+  }
+  .jammer-table tbody td,
+  .jammer-table thead th {
+    padding: 6px 6px;
+  }
+  .j-laps {
+    max-width: 120px;
+  }
+  .gs-row {
+    gap: 12px;
+  }
+}
