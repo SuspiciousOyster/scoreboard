@@ -40,6 +40,29 @@ T2_SKATERS = [
 PENALTIES = ["IllegalProcedure","BackBlock","LowBlock","HighBlock","IllegalContact",
     "IllegalZone","Misconduct","Unnecessary","Cutting","DirectionOfPlay","Interference","OutOfPlay"]
 
+# Penalty data — set AFTER all jams complete to ensure persistence
+# Only skaters with at least 1 recorded jam as jammer are "jammers"
+# T1 jammers: local idx 0=Bones,1=Smash,2=Blitz | T2 jammers: 0=Viper,1=Fury,2=Blade
+T1_PENALTIES = [
+    (0, "IllegalProcedure"),  # Bones (jammer) — power jam
+    (3, "LowBlock"), (3, "BackBlock"),      # Crash — 2 penalties
+    (4, "HighBlock"),                         # Rivet — 1
+    (6, "Cutting"), (6, "DirectionOfPlay"),  # Apex (pivot) — 2
+    (7, "IllegalContact"), (7, "Misconduct"), (7, "Unnecessary"),  # Vortex — 3
+    (10, "Interference"),                     # Nitro — 1
+    (12, "OutOfPlay"), (12, "LowBlock"),     # Pulse — 2
+]
+T2_PENALTIES = [
+    (15, "IllegalZone"), (15, "BackBlock"),  # Viper (jammer) — 2
+    (17, "BackBlock"),                        # Storm — 1
+    (18, "LowBlock"), (18, "HighBlock"), (18, "IllegalZone"),  # Bolt — 3
+    (19, "Cutting"),                          # Shadow (pivot) — 1
+    (20, "DirectionOfPlay"),                  # Strike — 1
+    (22, "Interference"), (22, "Misconduct"), # Ember — 2
+    (23, "OutOfPlay"),                        # Claw — 1
+    (24, "LowBlock"),                         # Rogue — 1
+]
+
 def gi(t, li):
     return li if t == 1 else li + 15
 
@@ -107,20 +130,6 @@ time.sleep(0.5)
 drain()
 
 # PENALTY ASSIGNMENTS (static — assigned to specific skaters)
-penalty_tracker = {1: {}, 2: {}}  # team -> {global_idx: [(code, period, jam)]}
-t1_pen_skaters = [(0,"BackBlock",1,3),(3,"LowBlock",1,8),(6,"IllegalContact",1,8),
-                  (1,"Cutting",2,5),(4,"HighBlock",2,5),(7,"DirectionOfPlay",2,8),
-                  (0,"Misconduct",2,11)]
-t2_pen_skaters = [(15,"IllegalZone",1,5),(17,"BackBlock",1,9),(18,"Interference",1,9),
-                  (20,"LowBlock",2,4),(23,"HighBlock",2,9),(15,"Cutting",2,12),(16,"Unnecessary",2,12)]
-
-# Power jams happen when a JAMMER gets a penalty
-t1_jammer_pen = {0: [(1, "IllegalProcedure")]}  # Skater 0 (Bones) gets penalized
-t2_jammer_pen = {2: [(2, "BackBlock")]}  # Skater 2 (Blitz for T2... wait, T2 jammers are 0,1,2 in local)
-
-# T2 jammer penalty: Viper (local 0) in period 2 jam 5
-t2_jammer_pen_tracker = [(2, 5)]  # T2 jammer local 0 gets penalty
-
 run_t1, run_t2 = 0, 0
 
 for jam_idx, (lead_t, t1j, t2j, t1s, t2s, sp_team, note) in enumerate(JAMS, 1):
@@ -152,25 +161,12 @@ for jam_idx, (lead_t, t1j, t2j, t1s, t2s, sp_team, note) in enumerate(JAMS, 1):
     run_t1 += t1_score
     run_t2 += t2_score
     
-    # Apply penalties
-    t1_penalties_this_jam = [(s,c) for (s,c,p,j) in t1_pen_skaters if p == period and j == jam]
-    t2_penalties_this_jam = [(s,c) for (s,c,p,j) in t2_pen_skaters if p == period and j == jam]
-    
-    # Power jams: T1 jammer penalty in period 1 jam 8
-    if jam_idx == 8:
-        t1_penalties_this_jam.append((0, "IllegalProcedure"))
-    # T2 jammer penalty in period 2 jam 5 (global jam 15)
-    if jam_idx == 15:
-        t2_penalties_this_jam.append((15, "BackBlock"))
-    
     # Print status
     t1n = T1_SKATERS[t1_local_j][0]
     t2n = T2_SKATERS[t2_local_j][0]
     extras = []
     if no_lead: extras.append("NO-LEAD")
     if sp_team: extras.append(f"SP-T{sp_team}")
-    if t1_penalties_this_jam: extras.append("⛓️")  # power jam indicator
-    if t2_penalties_this_jam: extras.append("⛓️")
     extra_str = f" ({', '.join(extras)})" if extras else ""
     print(f"  P{period}J{jam:02d}: {t1n} vs {t2n} = {t1_score}:{t2_score}{extra_str}", file=sys.stderr)
     
@@ -237,29 +233,6 @@ for jam_idx, (lead_t, t1j, t2j, t1s, t2s, sp_team, note) in enumerate(JAMS, 1):
         sk(f"{tj2}.ScoringTrip({ti+1}).Score", score)
         sk(f"{tj2}.ScoringTrip({ti+1}).AfterSP", "true" if after_sp else "false")
     
-    # ═══════ PENALTIES ═══════
-    p_idx = 0
-    for gs, code in t1_penalties_this_jam:
-        c = penalty_tracker[1].get(gs, 0) + 1
-        penalty_tracker[1][gs] = c
-        sk(f"Team(1).Skater({gs}).PenaltyCount", str(c))
-        # Only record first 3 penalty codes to avoid WS buffer issues
-        if c <= 3:
-            sk(f"Team(1).Skater({gs}).Penalty({c-1}).Code", code)
-            sk(f"Team(1).Skater({gs}).Penalty({c-1}).Jam", jam)
-            sk(f"Team(1).Skater({gs}).Penalty({c-1}).Period", period)
-        p_idx += 1
-    
-    for gs, code in t2_penalties_this_jam:
-        c = penalty_tracker[2].get(gs, 0) + 1
-        penalty_tracker[2][gs] = c
-        sk(f"Team(2).Skater({gs}).PenaltyCount", str(c))
-        if c <= 3:
-            sk(f"Team(2).Skater({gs}).Penalty({c-1}).Code", code)
-            sk(f"Team(2).Skater({gs}).Penalty({c-1}).Jam", jam)
-            sk(f"Team(2).Skater({gs}).Penalty({c-1}).Period", period)
-        p_idx += 1
-    
     # Update running scores
     sk("Team(1).Score", run_t1)
     sk("Team(2).Score", run_t2)
@@ -269,12 +242,31 @@ for jam_idx, (lead_t, t1j, t2j, t1s, t2s, sp_team, note) in enumerate(JAMS, 1):
     time.sleep(0.8)
     drain()
 
-# Final team penalty totals
-t1_total = sum(penalty_tracker[1].values())
-t2_total = sum(penalty_tracker[2].values())
-sk("Team(1).TotalPenalties", t1_total)
-sk("Team(2).TotalPenalties", t2_total)
+# ═══════ POST-GAME: SET PENALTIES ═══════
+# Setting penalties after all jams ensures they persist (scoreboard
+# overwrites WS.Set for PenaltyCount during active gameplay).
+print("Setting penalties...", file=sys.stderr)
+
+def set_penalty_block(team, penalties_list):
+    """Set penalty codes for a team. Returns (skater_counts, total)."""
+    counts = {}
+    for gs, code in penalties_list:
+        counts[gs] = counts.get(gs, 0) + 1
+    total = len(penalties_list)
+    
+    for gs, code in penalties_list:
+        idx = penalties_list[:penalties_list.index((gs, code))].count((gs, code))
+        # Don't set PenaltyCount — scoreboard auto-manages it
+        sk(f"Team({team}).Skater({gs}).Penalty({idx}).Code", code)
+    
+    sk(f"Team({team}).TotalPenalties", total)
+    return counts, total
+
+t1_counts, t1_total = set_penalty_block(1, T1_PENALTIES)
+t2_counts, t2_total = set_penalty_block(2, T2_PENALTIES)
+time.sleep(1)
+drain()
 
 print(f"\nComplete! Final: {T1_SKATERS[0][0]} {run_t1} : {run_t2} {T2_SKATERS[0][0]}", file=sys.stderr)
-print(f"Penalties — T1: {t1_total}, T2: {t2_total}", file=sys.stderr)
+print(f"Penalties — T1: {t1_total} ({len(t1_counts)} skaters), T2: {t2_total} ({len(t2_counts)} skaters)", file=sys.stderr)
 ws.close()
