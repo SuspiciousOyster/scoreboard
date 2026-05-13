@@ -24,6 +24,7 @@ html/custom
 !html/custom/view/announcer-jammers.html
 !html/custom/view/announcer-jammers.css
 !html/custom/view/announcer-jammers-render.js
+!html/custom/view/announcer-jammers.js
 html/themes/custom
 GameData
 android/.gradle/

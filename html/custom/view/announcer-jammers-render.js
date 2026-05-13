@@ -39,6 +39,59 @@
     return WS.state[PREFIX + '.' + suffix];
   }
 
+  /* ── Tooltip Definitions ── */
+
+  var TIPS = {
+    '#': 'Roster number on the skater\'s uniform.',
+    'Name': 'Skater name. SP badge = took the star in at least one jam.',
+    'Lap Scores': 'Points scored on each scoring pass, grouped by jam. [4,3] = two passes in one jam worth 4 and 3. * = after star pass.',
+    'J': 'Total jams played as jammer (includes star-pass pickups).',
+    'L': 'Jams where this jammer was declared lead.',
+    'L%': 'Lead percentage. (Lead ÷ Jams) × 100.',
+    'Tot': 'Total points scored by this jammer.',
+    'PPJ': 'Average points per jam. (Total ÷ Jams).',
+    '%T': 'Share of total team score. (Jammer score ÷ Team score) × 100.',
+  };
+
+  /** Show a positioned tooltip popup near the clicked element. */
+  function showTooltip(text, anchor) {
+    var el = document.getElementById('tip-popup');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'tip-popup';
+      el.className = 'tip-popup';
+      document.body.appendChild(el);
+      el.addEventListener('click', function (e) { e.stopPropagation(); });
+    }
+    el.textContent = text;
+    el.style.display = 'block';
+
+    // Position below the anchor, centred
+    var rect = anchor.getBoundingClientRect();
+    var top = rect.bottom + 8;
+    var left = rect.left + rect.width / 2;
+    el.style.top = top + 'px';
+    el.style.left = left + 'px';
+  }
+
+  function hideTooltip() {
+    var el = document.getElementById('tip-popup');
+    if (el) el.style.display = 'none';
+  }
+
+  // Dismiss tooltip on any click outside the popup
+  document.addEventListener('click', function () { hideTooltip(); });
+
+  // Show tooltip on tap/click of any .tip-trigger (delegated — works for dynamic content)
+  document.addEventListener('click', function (e) {
+    var trigger = e.target.closest('.tip-trigger');
+    if (!trigger) return;
+    e.stopPropagation();
+    var col = trigger.getAttribute('data-col');
+    var text = TIPS[col];
+    if (text) showTooltip(text, trigger);
+  });
+
   /* ═══════════════════════════════════════════
    *  Data Extraction
    * ═══════════════════════════════════════════ */
@@ -62,6 +115,8 @@
       var rest = m[4];
       var jamKey = period + '-' + jam;
       if (!jams[jamKey]) {
+        // Skip Period(0).Jam(0) — pregame placeholder with no real data
+        if (period === 0 && jam === 0) return;
         jams[jamKey] = {
           period: period,
           jam: jam,
@@ -123,7 +178,9 @@
       var field = m[3];
       var ref = 'Skater(' + idx + ')';
       if (!map[ref]) map[ref] = { name: null, number: null, teamNum: teamNum };
+      if (!map[idx]) map[idx] = { name: null, number: null, teamNum: teamNum };
       map[ref][field === 'Name' ? 'name' : 'number'] = WS.state[key];
+      map[idx][field === 'Name' ? 'name' : 'number'] = WS.state[key];
     });
     return map;
   }
@@ -134,6 +191,12 @@
   function resolveSkater(ref, skaterMap) {
     if (!ref) return { name: 'Unknown', number: '?' };
     ref = ref.trim();
+    // Handle bare numeric IDs (real scoreboard format: Fielding(Jammer).Skater = "0")
+    if (/^\d+$/.test(ref) && skaterMap[ref]) {
+      var s = skaterMap[ref];
+      return { name: s.name || ref, number: s.number || '?' };
+    }
+    // Handle Skater(N) format (demo/mock format and legacy data)
     if (ref.indexOf('Skater(') === 0) {
       var s = skaterMap[ref];
       if (s) return { name: s.name || ref, number: s.number || '?' };
@@ -349,10 +412,10 @@
 
     el.innerHTML =
       '<div class="gs-row">' +
-        '<div class="gs-stat"><span class="gs-label">Lead %</span><span class="gs-value">' + leadPct1 + '%</span><span class="gs-divider">|</span><span class="gs-value">' + leadPct2 + '%</span></div>' +
-        '<div class="gs-stat"><span class="gs-label">Lead</span><span class="gs-value">' + ts1.leadCount + '</span><span class="gs-divider">|</span><span class="gs-value">' + ts2.leadCount + '</span></div>' +
-        '<div class="gs-stat"><span class="gs-label">Score</span><span class="gs-value">' + ts1.totalScore + '</span><span class="gs-divider">:</span><span class="gs-value">' + ts2.totalScore + '</span></div>' +
-        '<div class="gs-stat"><span class="gs-label">PPJ</span><span class="gs-value">' + ppj1 + '</span><span class="gs-divider">|</span><span class="gs-value">' + ppj2 + '</span></div>' +
+        '<div class="gs-stat"><span class="gs-label">Lead %</span><span class="gs-value gs-t1">' + leadPct1 + '%</span><span class="gs-divider">|</span><span class="gs-value gs-t2">' + leadPct2 + '%</span></div>' +
+        '<div class="gs-stat"><span class="gs-label">Lead</span><span class="gs-value gs-t1">' + ts1.leadCount + '</span><span class="gs-divider">|</span><span class="gs-value gs-t2">' + ts2.leadCount + '</span></div>' +
+        '<div class="gs-stat"><span class="gs-label">Score</span><span class="gs-value gs-t1">' + ts1.totalScore + '</span><span class="gs-divider">:</span><span class="gs-value gs-t2">' + ts2.totalScore + '</span></div>' +
+        '<div class="gs-stat"><span class="gs-label">PPJ</span><span class="gs-value gs-t1">' + ppj1 + '</span><span class="gs-divider">|</span><span class="gs-value gs-t2">' + ppj2 + '</span></div>' +
         '<div class="gs-stat"><span class="gs-label">Ratio</span><span class="gs-value gs-ratio">' + ratio + '</span></div>' +
       '</div>';
   }
@@ -409,21 +472,21 @@
     el.innerHTML =
       '<table class="jammer-table">' +
         '<thead><tr>' +
-          '<th>#</th>' +
-          '<th>Name</th>' +
-          '<th>Lap Scores</th>' +
-          '<th title="Jams">J</th>' +
-          '<th title="Lead">L</th>' +
-          '<th title="Lead %">L%</th>' +
-          '<th title="Total">Tot</th>' +
-          '<th title="Points Per Jam">PPJ</th>' +
-          '<th title="% of Team Score">%T</th>' +
+          '<th><span class="tip-trigger" data-col="#">#<span class="tip-icon">ⓘ</span></span></th>' +
+          '<th><span class="tip-trigger" data-col="Name">Name<span class="tip-icon">ⓘ</span></span></th>' +
+          '<th><span class="tip-trigger" data-col="Lap Scores">Lap Scores<span class="tip-icon">ⓘ</span></span></th>' +
+          '<th><span class="tip-trigger" data-col="J">J<span class="tip-icon">ⓘ</span></span></th>' +
+          '<th><span class="tip-trigger" data-col="L">L<span class="tip-icon">ⓘ</span></span></th>' +
+          '<th><span class="tip-trigger" data-col="L%">L%<span class="tip-icon">ⓘ</span></span></th>' +
+          '<th><span class="tip-trigger" data-col="Tot">Tot<span class="tip-icon">ⓘ</span></span></th>' +
+          '<th><span class="tip-trigger" data-col="PPJ">PPJ<span class="tip-icon">ⓘ</span></span></th>' +
+          '<th><span class="tip-trigger" data-col="%T">%T<span class="tip-icon">ⓘ</span></span></th>' +
         '</tr></thead>' +
         '<tbody>' + rows + '</tbody>' +
       '</table>';
   }
 
-  function renderTeamHeader(teamNum) {
+  function renderTeamHeader(teamNum, computedScore) {
     var nameEl = document.getElementById('team-name-' + teamNum);
     if (nameEl) {
       var altKey = PREFIX + '.Team(' + teamNum + ').AlternateName(operator)';
@@ -431,10 +494,15 @@
       var name = WS.state[altKey] || WS.state[nameKey] || 'Team ' + teamNum;
       nameEl.textContent = name;
     }
-    // Update team score in section header (used by both game-day view and demo)
+    // Update team score in section header — use computed value if available
     var scoreEl = document.getElementById('team-score-' + teamNum);
     if (scoreEl) {
-      scoreEl.textContent = asNum(getPath('Team(' + teamNum + ').Score'));
+      scoreEl.textContent = computedScore != null ? computedScore : asNum(getPath('Team(' + teamNum + ').Score'));
+    }
+    // Apply team color class to the header element
+    var headerEl = document.getElementById('team-header-' + teamNum);
+    if (headerEl) {
+      headerEl.classList.add('t' + teamNum + '-header');
     }
   }
 
@@ -463,15 +531,16 @@
   function fullRender() {
     var stats = computeAllStats();
 
-    // Update team names
-    [1, 2].forEach(function (num) { renderTeamHeader(num); });
+    // Update team names and scores using computed values
+    [1, 2].forEach(function (num) { renderTeamHeader(num, stats.teamStats[String(num)].totalScore); });
 
     // Update game stats header
     renderGameStats(stats);
 
-    // Get team scores for percentage calculation
-    var team1Score = asNum(getPath('Team(1).Score'));
-    var team2Score = asNum(getPath('Team(2).Score'));
+    // Use computed team scores (from summing JamScores) rather than Team(N).Score
+    // which may be stale or auto-computed incorrectly by the scoreboard
+    var team1Score = stats.teamStats['1'].totalScore;
+    var team2Score = stats.teamStats['2'].totalScore;
 
     // Render per-team jammer tables
     renderJammerTable(1, null, stats.jammers, team1Score);

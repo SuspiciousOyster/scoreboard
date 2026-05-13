@@ -1,49 +1,52 @@
 #!/usr/bin/env python3
-"""
-Drive the CRG ScoreBoard through a full 12-jam game using StartJam/StopJam
-Commands (which create Period/Jam objects) + WS.Set to fill scoring data.
-
-Usage: Run with scoreboard already started on port 8000.
-"""
-import json, time, sys, websocket
+"""Create 12 jams, then set all data. Separates jam creation from data writing."""
+import json, time, sys, websocket, re
 
 PREFIX = "ScoreBoard.CurrentGame"
 ws = None
 
 def sc(**k):
     ws.send(json.dumps(k))
-    time.sleep(0.1)
+    time.sleep(0.08)
 
 def set_key(key, value):
     sc(action="Set", key=f"{PREFIX}.{key}", value=str(value), flag="")
 
-def cmd_set(path, value):
-    sc(action="Set", key=f"{PREFIX}.{path}", value=str(value), flag="")
+def drain():
+    ws.settimeout(0.3)
+    try:
+        while True: ws.recv()
+    except: pass
+    ws.settimeout(3)
 
-def sleep(s):
-    time.sleep(s)
+t1_skaters = [("Bones","420"),("Smash","777"),("Blitz","99"),("Crash","11"),("Rivet","88")]
+t2_skaters = [("Viper","13"),("Fury","8"),("Blade","42"),("Storm","7"),("Bolt","23")]
 
-# ═══════════ Data ═══════════
-t1_skaters = [("Bones","420"),("Smash","777"),("Blitz","99"),("Crash","11")]
-t2_skaters = [("Viper","13"),("Fury","8"),("Blade","42"),("Storm","7")]
+def gi(t, li):
+    return li if t == 1 else li + 5
 
-# Each jam: t1_jammer_idx, t2_jammer_idx, t1_lead, t2_lead, t1_trips, t2_trips, sp_to, sp_trips
 JAMS = [
-    (0,4, True,False, [4,3],[1], None,[]),          # Jam 1
-    (0,5, False,True, [1],[3,2,2], None,[]),        # Jam 2
-    (1,4, True,False, [3,1],[2], None,[]),           # Jam 3
-    (0,4, True,False, [5],[], None,[]),              # Jam 4
-    (1,4, False,True, [],[4,1,1], None,[]),          # Jam 5
-    (0,4, True,False, [2,2,1],[1], None,[]),         # Jam 6
-    (0,5, False,True, [1],[3], 2,[2]),               # Jam 7 — Star pass: Bones→Blitz
-    (1,4, True,False, [2,2],[2,1], 2,[1,2,1]),      # Jam 8 — Star pass: Smash→Blitz
-    (0,4, True,False, [4,2],[], None,[]),            # Jam 9
-    (2,5, False,True, [2],[5], None,[]),             # Jam 10
-    (0,4, True,False, [3,3],[2,1], None,[]),         # Jam 11
-    (1,3, False,True, [2,2],[4,2,1], 2,[1,2,1]),    # Jam 12 — Star pass: Smash→Blitz
+    (0,0, True,False, [4,3],[1], None,[]),
+    (0,1, False,True, [1],[3,2,2], None,[]),
+    (1,0, True,False, [3,1],[2], None,[]),
+    (0,0, True,False, [5],[], None,[]),
+    (1,0, False,True, [],[4,1,1], None,[]),
+    (0,0, True,False, [2,2,1],[1], None,[]),
+    (0,1, False,True, [1],[3], 2,[2]),
+    (1,0, True,False, [2,2],[2,1], 2,[1,2,1]),
+    (0,0, True,False, [4,2],[], None,[]),
+    (2,1, False,True, [2],[5], None,[]),
+    (0,0, True,False, [3,3],[2,1], None,[]),
+    (1,3, False,True, [2,2],[4,2,1], 2,[1,2,1]),
 ]
 
-# ═══════════ Connect ═══════════
+BLOCKERS = [
+    (1,2,3, 1,2,3), (1,2,3, 0,2,3), (0,2,3, 1,2,3), (1,2,3, 1,2,3),
+    (0,2,3, 0,2,3), (1,2,3, 1,2,4), (1,3,4, 0,2,3), (0,3,4, 1,2,4),
+    (1,2,3, 1,2,3), (0,1,3, 0,2,3), (1,2,3, 1,2,4), (0,3,4, 0,1,3),
+]
+
+# Connect
 ws = websocket.create_connection("ws://localhost:8000/WS/?source=game_operator")
 ws.settimeout(3)
 time.sleep(0.3)
@@ -51,58 +54,42 @@ try:
     while True: ws.recv()
 except: pass
 
+# Start game
 print("Creating game...", file=sys.stderr)
 sc(action="StartNewGame", data={"Team1":"WFTDA","Team2":"WFTDA","Ruleset":"wftda2018","Advance":False})
-sleep(2)
+time.sleep(2)
 
-# Set teams
+# Teams & skaters
 set_key("Team(1).Name", "Thunderbirds")
 set_key("Team(2).Name", "Valkyries")
-
-# Set skaters
 for i,(n,num) in enumerate(t1_skaters):
     set_key(f"Team(1).Skater({i}).Name", n)
     set_key(f"Team(1).Skater({i}).RosterNumber", num)
 for i,(n,num) in enumerate(t2_skaters):
-    set_key(f"Team(2).Skater({i+4}).Name", n)
-    set_key(f"Team(2).Skater({i+4}).RosterNumber", num)
-sleep(0.5)
+    g = i + 5
+    set_key(f"Team(2).Skater({g}).Name", n)
+    set_key(f"Team(2).Skater({g}).RosterNumber", num)
+time.sleep(1)
+drain()
 
+# PHASE 1: Create all 12 jams
+print("Creating 12 jams...", file=sys.stderr)
+for i in range(12):
+    sc(action="Set", key=f"{PREFIX}.StartJam", value="true", flag="")
+    time.sleep(1.5)
+    sc(action="Set", key=f"{PREFIX}.StopJam", value="true", flag="")
+    time.sleep(1)
+    drain()
+print("Jams created.", file=sys.stderr)
+
+# PHASE 2: Set all data for each jam
+print("Writing jam data...", file=sys.stderr)
 run_t1, run_t2 = 0, 0
-
-def run_jam(jam_idx, jam):
-    global run_t1, run_t2
+for jam_idx, jam in enumerate(JAMS):
     t1s,t2s, t1l,t2l, t1t,t2t, t1_sp_to, t1_sp_t = jam[:8]
-    
-    t1_name = t1_skaters[t1s][0]
-    t2_name = t2_skaters[t2s-4][0]
-    
-    print(f"Jam {jam_idx}/12: {t1_name} vs {t2_name}...", end=" ", file=sys.stderr)
-    
-    # Start jam — creates Period(1).Jam(N) in the game model
-    cmd_set("StartJam", "true")
-    sleep(0.5)
-    
-    # Detect the jam number from state
-    sc(action="Register", paths=[f"{PREFIX}.Period(1).Jam(*).TeamJam(1).JamScore"])
-    sleep(0.3)
-    jam_state = {}
-    ws.settimeout(0.5)
-    try:
-        while True:
-            msg = ws.recv()
-            d = json.loads(msg)
-            if "state" in d:
-                jam_state.update(d["state"])
-    except: pass
-    
-    j_num = 1
-    for k in sorted(jam_state.keys()):
-        if ".Jam(" in k and ".TeamJam(1).JamScore" in k and "Period(1).Jam(" in k:
-            parts = k.split(".Jam(")
-            if len(parts) > 1:
-                jn = int(parts[1].split(")")[0])
-                if jn > j_num: j_num = jn
+    blk = BLOCKERS[jam_idx]
+    t1_b, t2_b = blk[:3], blk[3:]
+    j_num = jam_idx + 1
     
     t1_total = sum(t1t) + sum(t1_sp_t)
     t2_total = sum(t2t)
@@ -112,45 +99,44 @@ def run_jam(jam_idx, jam):
     tj1 = f"Period(1).Jam({j_num}).TeamJam(1)"
     tj2 = f"Period(1).Jam({j_num}).TeamJam(2)"
     
-    # Scoring data
     set_key(f"{tj1}.JamScore", t1_total)
     set_key(f"{tj1}.Lead", "true" if t1l else "false")
     set_key(f"{tj2}.JamScore", t2_total)
     set_key(f"{tj2}.Lead", "true" if t2l else "false")
     
     # Fielding
-    set_key(f"{tj1}.Fielding(Jammer).Skater", f"Skater({t1s})")
-    set_key(f"{tj1}.Fielding(Jammer).SkaterNumber", t1_skaters[t1s][1])
-    set_key(f"{tj2}.Fielding(Jammer).Skater", f"Skater({t2s})")
-    set_key(f"{tj2}.Fielding(Jammer).SkaterNumber", t2_skaters[t2s-4][1])
+    set_key(f"{tj1}.Fielding(Jammer).Skater", gi(1, t1s))
+    set_key(f"{tj2}.Fielding(Jammer).Skater", gi(2, t2s))
+    set_key(f"{tj1}.Fielding(Blocker1).Skater", gi(1, t1_b[0]))
+    set_key(f"{tj1}.Fielding(Blocker2).Skater", gi(1, t1_b[1]))
+    set_key(f"{tj1}.Fielding(Blocker3).Skater", gi(1, t1_b[2]))
+    set_key(f"{tj2}.Fielding(Blocker1).Skater", gi(2, t2_b[0]))
+    set_key(f"{tj2}.Fielding(Blocker2).Skater", gi(2, t2_b[1]))
+    set_key(f"{tj2}.Fielding(Blocker3).Skater", gi(2, t2_b[2]))
+    # Pivot
+    all_local = set(range(5))
+    pivot1 = sorted(all_local - {t1s} - set(t1_b))[0]
+    pivot2 = sorted(all_local - {t2s} - set(t2_b))[0]
+    set_key(f"{tj1}.Fielding(Pivot).Skater", gi(1, t1_sp_to if t1_sp_to is not None else pivot1))
+    set_key(f"{tj2}.Fielding(Pivot).Skater", gi(2, pivot2))
     
     # Scoring trips
     for ti, score in enumerate(t1t + t1_sp_t):
         after_sp = ti >= len(t1t)
         set_key(f"{tj1}.ScoringTrip({ti+1}).Score", score)
         set_key(f"{tj1}.ScoringTrip({ti+1}).AfterSP", "true" if after_sp else "false")
-    
     for ti, score in enumerate(t2t):
         set_key(f"{tj2}.ScoringTrip({ti+1}).Score", score)
         set_key(f"{tj2}.ScoringTrip({ti+1}).AfterSP", "false")
     
-    # Star pass
     if t1_sp_to is not None:
         set_key(f"{tj1}.StarPass", "true")
-        set_key(f"{tj1}.Fielding(Pivot).Skater", f"Skater({t1_sp_to})")
-        set_key(f"{tj1}.Fielding(Pivot).SkaterNumber", t1_skaters[t1_sp_to][1])
     
     set_key("Team(1).Score", run_t1)
     set_key("Team(2).Score", run_t2)
     
-    sleep(0.3)
-    cmd_set("StopJam", "true")
-    sleep(0.5)
-    print(f"T1:{t1_total}, T2:{t2_total}", file=sys.stderr)
+    print(f"  Jam {j_num}: T1={t1_total}, T2={t2_total}", file=sys.stderr)
+    time.sleep(0.3)
 
-# Run all jams
-for i, jam in enumerate(JAMS):
-    run_jam(i+1, jam)
-
-print(f"\nGame complete! Final: {run_t1} : {run_t2}", file=sys.stderr)
+print(f"\nComplete! Final: {run_t1} : {run_t2}", file=sys.stderr)
 ws.close()
