@@ -268,20 +268,20 @@
     // Team 1 fielding
     var t1JammerIdx = jamData.team1.jammer;
     var t1JammerRef = 'Skater(' + t1JammerIdx + ')';
-    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(0).Skater'] = t1JammerRef;
-    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(0).SkaterNumber'] = TEAM1_SKATERS[t1JammerIdx].number;
-    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(0).Position'] = 'Jammer';
-    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(0).NotFielded'] = 'false';
+    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(Jammer).Skater'] = t1JammerRef;
+    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(Jammer).SkaterNumber'] = TEAM1_SKATERS[t1JammerIdx].number;
+    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(Jammer).Position'] = 'Jammer';
+    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(Jammer).NotFielded'] = 'false';
 
     // Team 2 fielding
     var t2JammerIdx = jamData.team2.jammer;
     // Map global skater index (3,4,5) to local TEAM2_SKATERS index (0,1,2)
     var t2LocalIdx = t2JammerIdx - TEAM1_SKATERS.length;
     var t2JammerRef = 'Skater(' + t2JammerIdx + ')';
-    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(2).Fielding(0).Skater'] = t2JammerRef;
-    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(2).Fielding(0).SkaterNumber'] = TEAM2_SKATERS[t2LocalIdx].number;
-    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(2).Fielding(0).Position'] = 'Jammer';
-    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(2).Fielding(0).NotFielded'] = 'false';
+    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(2).Fielding(Jammer).Skater'] = t2JammerRef;
+    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(2).Fielding(Jammer).SkaterNumber'] = TEAM2_SKATERS[t2LocalIdx].number;
+    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(2).Fielding(Jammer).Position'] = 'Jammer';
+    s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(2).Fielding(Jammer).NotFielded'] = 'false';
 
     // Team 1 TeamJam fields
     var t1JamScore = 0;
@@ -314,9 +314,9 @@
 
     // Star pass recipient fielding — Team 1
     if (jamData.team1.starPassTo !== undefined) {
-      s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(1).Skater'] = 'Skater(' + jamData.team1.starPassTo + ')';
-      s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(1).SkaterNumber'] = TEAM1_SKATERS[jamData.team1.starPassTo].number;
-      s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(1).Position'] = 'Jammer';
+      s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(Pivot).Skater'] = 'Skater(' + jamData.team1.starPassTo + ')';
+      s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(Pivot).SkaterNumber'] = TEAM1_SKATERS[jamData.team1.starPassTo].number;
+      s[PREFIX + '.Period(' + period + ').Jam(' + jam + ').TeamJam(1).Fielding(Pivot).Position'] = 'Jammer';
     }
 
     // Team 2 TeamJam fields

@@ -74,8 +74,10 @@
       var tj = jams[jamKey].teams[team];
       if (!tj) return;
 
-      // Parse remaining path — could be nested (e.g. Fielding(0).Skater)
-      var parts = rest.match(/^(\w+)\((\d+)\)\.(\w+)$/);
+      // Parse remaining path — could be nested (e.g. Fielding(Jammer).Skater or ScoringTrip(0).Score)
+      // Fielding keys are FloorPosition names ("Jammer", "Pivot", "Blocker1", etc.)
+      // ScoringTrip keys are numeric
+      var parts = rest.match(/^(\w+)\(([^)]+)\)\.(\w+)$/);
       if (parts) {
         var childType = parts[1]; // Fielding or ScoringTrip
         var childIdx = parts[2];
@@ -196,22 +198,39 @@
         if (isLead) teamStats[tn].leadCount++;
 
         // Find jammer(s)
-        // Fielding entries are indexed: Fielding(0).Skater, Fielding(1).Skater, etc.
-        // Each has: Skater, SkaterNumber, Position
+        // In real scoreboard, fielding is keyed by FloorPosition name:
+        //   Fielding(Jammer).Skater = starting jammer
+        //   Fielding(Pivot).Skater = pivot (becomes jammer after star pass)
+        //   Fielding(Blocker1/2/3).Skater = blockers (never jammers)
+        // In mock/demo WS, fielding may use numeric keys Fielding(0), Fielding(1)
         var fielding = tj.Fielding || {};
         var fieldingKeys = Object.keys(fielding).sort();
 
-        // Find skaters who were jammer (first fielding at Jammer position is starting jammer)
         var jammerRefs = [];
 
-        // Primary approach: iterate fieldings and look for Skater entries
-        fieldingKeys.forEach(function (idx) {
-          var f = fielding[idx];
-          if (f.Skater && f.Skater.trim()) {
-            // Record this skater as a jammer
+        // Approach: look for fielding entries where Position = "Jammer"
+        // OR find the first/primary jammer by convention
+        var foundJammer = false;
+        fieldingKeys.forEach(function (key) {
+          var f = fielding[key];
+          if (!f.Skater || !f.Skater.trim()) return;
+          var pos = (f.Position || '').trim();
+          if (pos === 'Jammer') {
             jammerRefs.push(f.Skater.trim());
+            if (!foundJammer) foundJammer = true;
           }
         });
+
+        // Fallback: if no Position-based filtering worked, take all fielding
+        // (handles numeric-indexed mock data and legacy format)
+        if (!foundJammer) {
+          fieldingKeys.forEach(function (key) {
+            var f = fielding[key];
+            if (f.Skater && f.Skater.trim()) {
+              jammerRefs.push(f.Skater.trim());
+            }
+          });
+        }
 
         // If no fielding data found, try the legacy pattern
         if (jammerRefs.length === 0) {
