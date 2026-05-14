@@ -5,42 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Announcer Jammers — Demo</title>
 
-    <!-- Load jQuery from CDN for the standalone demo -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
     <!-- Load mock WS (defines WS, startGameScenario, resetScenario) -->
     <script src="mock-ws.js"></script>
 
-    <!-- Load shared render logic (uses WS.*, populates #game-stats, #jammer-table-N) -->
-    <!-- NOTE: This is a copy of html/custom/view/announcer-jammers-render.js -->
+    <!-- Load the CANONICAL view render logic from html/custom/view/ (via symlink) -->
     <script src="announcer-jammers-render.js"></script>
 
+    <!-- Load the CANONICAL view styles from html/custom/view/ (via symlink) -->
     <link rel="stylesheet" href="announcer-jammers.css">
-
-    <!-- Debug overlay for troubleshooting -->
-    <script src="debug-overlay.js"></script>
-
-    <!-- Debug logging for timeline rendering -->
-    <script>
-    (function() {
-      var origRender = window._announcerJammersRender;
-      if (origRender) {
-        window._announcerJammersRender = function() {
-          console.log('[demo] fullRender called');
-          try {
-            origRender();
-            var tl = document.getElementById('score-timeline');
-            if (tl) {
-              var hasContent = tl.innerHTML.indexOf('tl-container') !== -1;
-              console.log('[demo] timeline rendered:', hasContent ? 'YES - has bars' : 'NO - empty/placeholder');
-            }
-          } catch(e) {
-            console.error('[demo] render error:', e.message, e.stack);
-          }
-        };
-      }
-    })();
-    </script>
   </head>
   <body class="preload">
     <div class="announcer-jammers">
@@ -154,11 +126,7 @@
         var btnReset = document.getElementById('btn-reset');
 
         btnStart.addEventListener('click', function () {
-          // Reset any previous state
-          if (typeof resetScenario === 'function') resetScenario();
-          // Populate mock state with initial teams + skaters then render
-          WS._fireAfterLoad();
-          // Start the game scenario
+          // startGameScenario handles everything: init state, fire AfterLoad, begin jam loop
           startGameScenario();
           btnStart.textContent = '▶ Running…';
           btnStart.disabled = true;
@@ -166,23 +134,20 @@
         });
 
         btnReset.addEventListener('click', function () {
-          if (typeof resetScenario === 'function') resetScenario();
-          // Re-render to show empty state
-          var emptyEls = document.querySelectorAll('.empty-message');
-          if (emptyEls.length > 0) {
-            document.getElementById('game-stats').innerHTML =
-              '<div class="empty-message">Click "Start Demo Game" to begin…</div>';
-            document.getElementById('jammer-table-1').innerHTML =
-              '<div class="empty-message">Click "Start Demo Game" to begin…</div>';
-            document.getElementById('jammer-table-2').innerHTML =
-              '<div class="empty-message">Click "Start Demo Game" to begin…</div>';
-            document.getElementById('score-timeline').innerHTML =
-              '<div style="padding:24px; text-align:center; color:var(--text-secondary); font-style:italic;">Timeline will appear once the game starts…</div>';
-            document.getElementById('penalties-1').innerHTML =
-              '<div class="pen-empty">Penalties will appear once the game starts…</div>';
-            document.getElementById('penalties-2').innerHTML =
-              '<div class="pen-empty">Penalties will appear once the game starts…</div>';
-          }
+          resetScenario();
+          // Reset all view sections to placeholder state
+          document.getElementById('game-stats').innerHTML =
+            '<div class="empty-message">Click "Start Demo Game" to begin…</div>';
+          document.getElementById('jammer-table-1').innerHTML =
+            '<div class="empty-message">Click "Start Demo Game" to begin…</div>';
+          document.getElementById('jammer-table-2').innerHTML =
+            '<div class="empty-message">Click "Start Demo Game" to begin…</div>';
+          document.getElementById('score-timeline').innerHTML =
+            '<div style="padding:24px; text-align:center; color:var(--text-secondary); font-style:italic;">Timeline will appear once the game starts…</div>';
+          document.getElementById('penalties-1').innerHTML =
+            '<div class="pen-empty">Penalties will appear once the game starts…</div>';
+          document.getElementById('penalties-2').innerHTML =
+            '<div class="pen-empty">Penalties will appear once the game starts…</div>';
           btnStart.textContent = '▶ Start Demo Game';
           btnStart.disabled = false;
         });
