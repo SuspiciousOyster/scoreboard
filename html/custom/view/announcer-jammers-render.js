@@ -487,10 +487,21 @@
 
     // ── Score Differential ──
     var diff = ts1.totalScore - ts2.totalScore;
-    var diffHtml = '<div class="diff-stat">' +
+    var t1Name = escHtml(getTeamName(1));
+    var t2Name = escHtml(getTeamName(2));
+    var diffTitle;
+    if (diff > 0) {
+      diffTitle = t1Name + ' leads by ' + diff;
+    } else if (diff < 0) {
+      diffTitle = t2Name + ' leads by ' + Math.abs(diff);
+    } else {
+      diffTitle = 'Tied';
+    }
+    var diffHtml = '<div class="diff-stat" title="Score differential: ' + diffTitle + '">' +
       '<span class="diff-arrow diff-arrow-t1' + (diff > 0 ? ' is-leading' : '') + '">◀</span>' +
       '<span class="diff-value">' + (diff === 0 ? '—' : Math.abs(diff)) + '</span>' +
       '<span class="diff-arrow diff-arrow-t2' + (diff < 0 ? ' is-leading' : '') + '">▶</span>' +
+      '<span class="diff-label" style="font-size:9px;color:var(--aj-text-muted);margin-left:4px;cursor:help;">ⓘ</span>' +
       '</div>';
 
     // ── State Badge ──
@@ -639,64 +650,104 @@
     }
 
     // ── Star Pass ★ Indicator ──
-    // Color reflects the team's current star-pass / lead state:
-    //   star-lead = team had lead this jam
-    //   star-sp    = star pass was completed
-    //   star-nil   = no special state
+    // Only appears when a star pass was completed in the most recent jam.
+    // Hidden entirely otherwise (no dim/nil state).
     var starEl = document.getElementById('star-' + teamNum);
     if (starEl) {
-      // Scan recent TeamJam data for this team's StarPass and Lead status
       var hasSP = false;
-      var hasLead = false;
       var teamJams = collectTeamJams();
-      // Look at the most recent jam for this team
       for (var i = teamJams.length - 1; i >= 0; i--) {
         var jam = teamJams[i];
         var tj = jam && jam.teams && jam.teams[String(teamNum)];
         if (tj) {
           if (isTrue(tj.StarPass)) hasSP = true;
-          if (isTrue(tj.Lead)) hasLead = true;
-          break; // Only need the most recent jam
+          break;
         }
       }
-
-      starEl.className = 'team-star';
       if (hasSP) {
-        starEl.classList.add('star-sp');
-      } else if (hasLead) {
-        starEl.classList.add('star-lead');
+        starEl.className = 'team-star star-sp';
+        starEl.style.display = '';
+        starEl.title = escHtml(getTeamName(teamNum)) + ' completed a star pass';
       } else {
-        starEl.classList.add('star-nil');
+        starEl.style.display = 'none';
+      }
+    }
+
+    // ── Lead Indicator ──
+    // Shows a colored badge when this team had lead in the most recent jam.
+    var leadEl = document.getElementById('lead-' + teamNum);
+    if (leadEl) {
+      var hasLead = false;
+      var teamJams = collectTeamJams();
+      for (var i = teamJams.length - 1; i >= 0; i--) {
+        var jam = teamJams[i];
+        var tj = jam && jam.teams && jam.teams[String(teamNum)];
+        if (tj) {
+          if (isTrue(tj.Lead)) hasLead = true;
+          break;
+        }
+      }
+      if (hasLead) {
+        leadEl.className = 'lead-badge lead-on';
+        leadEl.title = escHtml(getTeamName(teamNum)) + ' has Lead Jammer status';
+        leadEl.textContent = 'L';
+      } else {
+        leadEl.className = 'lead-badge lead-off';
+        leadEl.textContent = '';
       }
     }
 
     // ── Power Jam ⚡ Indicator ──
-    // Shows when the OPPONENT's jammer is/was in the penalty box.
-    // We check by looking at the current team's BoxTrip data — if this
-    // team's jammer has an active box trip, the OTHER team gets the bolt.
+    // Shows when THIS team is on a power jam (opponent's jammer in the box).
+    // Only ONE team can be on a power jam at a time. If both teams have
+    // active box trips (unexpected data), we show neither — the data is
+    // inconsistent and we display nothing rather than guess which is correct.
     var pjEl = document.getElementById('power-jam-' + teamNum);
     if (pjEl) {
-      // Determine opponent team number
       var oppTeam = teamNum === 1 ? 2 : 1;
-      // Check if opponent jammer has active box trips
-      var inPowerJam = false;
+      var team1InPowerJam = false;
+      var team2InPowerJam = false;
       var reBox = new RegExp(
         '^' + PREFIX.replace(/\./g, '\\.') +
-        '\\.Team\\(' + oppTeam + '\\)\\.BoxTrip\\((\\d+)\\)\\.(PenaltyTime|Serving)$'
+        '\\.Team\\(' + '(\\d+)' + '\\)\\.BoxTrip\\((\\d+)\\)\\.(PenaltyTime|Serving)$'
       );
       Object.keys(WS.state).forEach(function (key) {
         var m = key.match(reBox);
         if (!m) return;
-        var field = m[2];
+        var t = parseInt(m[1], 10);
+        var field = m[3];
         var val = WS.state[key];
-        if (field === 'PenaltyTime' && asNum(val) > 0) {
-          inPowerJam = true;
-        } else if (field === 'Serving' && isTrue(val)) {
-          inPowerJam = true;
-        }
+        var active = (field === 'PenaltyTime' && asNum(val) > 0) || (field === 'Serving' && isTrue(val));
+        if (active && t === 1) team1InPowerJam = true;
+        if (active && t === 2) team2InPowerJam = true;
       });
-      pjEl.className = 'team-power-jam' + (inPowerJam ? '' : ' hidden');
+
+      // Mutual exclusion: opponent's jammer in box = this team on power jam.
+      // If both teams have active box trips, show neither (data inconsistency).
+      var showBolt = false;
+      if (team1InPowerJam && !team2InPowerJam) {
+        // Team 1 jammer in box → Team 2 on power jam
+        showBolt = (teamNum === 2);
+      } else if (team2InPowerJam && !team1InPowerJam) {
+        // Team 2 jammer in box → Team 1 on power jam
+        showBolt = (teamNum === 1);
+      }
+      // If both or neither: showBolt stays false — display nothing
+
+      pjEl.className = 'team-power-jam' + (showBolt ? '' : ' hidden');
+      if (showBolt) {
+        var oppName = escHtml(getTeamName(oppTeam));
+        pjEl.title = escHtml(getTeamName(teamNum)) + ' on a power jam — ' + oppName + "'s jammer is serving time";
+      }
     }
+  }
+
+  /* ── Team name helper ── */
+
+  function getTeamName(teamNum) {
+    var altKey = PREFIX + '.Team(' + teamNum + ').AlternateName(operator)';
+    var nameKey = PREFIX + '.Team(' + teamNum + ').Name';
+    return WS.state[altKey] || WS.state[nameKey] || 'Team ' + teamNum;
   }
 
   /* ── Score Timeline ── */

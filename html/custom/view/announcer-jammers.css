@@ -416,19 +416,37 @@ body.preload * {
   transition: color 0.3s ease;
 }
 
-.team-star.star-lead {
-  color: var(--aj-lead-color);
-  filter: drop-shadow(0 0 4px var(--aj-lead-color));
-}
-
 .team-star.star-sp {
   color: var(--aj-sp-color);
   filter: drop-shadow(0 0 4px var(--aj-sp-color));
 }
 
-.team-star.star-nil {
-  color: var(--aj-star-nil);
-  filter: none;
+/* ── Lead Badge ── */
+.lead-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 22px;
+  height: 22px;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: var(--aj-border-radius-sm);
+  letter-spacing: 0.04em;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.lead-badge.lead-on {
+  background: var(--aj-lead-bg);
+  color: var(--aj-lead-color);
+  border: 1px solid var(--aj-lead-border);
+  filter: drop-shadow(0 0 4px var(--aj-lead-color));
+}
+
+.lead-badge.lead-off {
+  background: transparent;
+  color: transparent;
+  border: 1px solid transparent;
 }
 
 /* ── Power Jam ⚡ Bolt ── */
@@ -920,5 +938,10 @@ body.preload * {
   .team-star,
   .team-power-jam {
     font-size: var(--aj-font-size-xl);
+  }
+  .lead-badge {
+    min-width: 18px;
+    height: 18px;
+    font-size: 9px;
   }
 }

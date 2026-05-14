@@ -214,6 +214,14 @@
     WS.Set(PREFIX + '.Clock(Jam).Time', '75000');
     WS.Set(PREFIX + '.Clock(Lineup).Running', 'false');
 
+    // Clear stale BoxTrip entries from previous jams so power jam ⚡
+    // detection only reacts to the current jam's penalty state
+    Object.keys(WS.state).forEach(function (key) {
+      if (/^ScoreBoard\.CurrentGame\.Team\(\d+\)\.BoxTrip\(/.test(key)) {
+        delete WS.state[key];
+      }
+    });
+
     // Sweep both teams
     [1, 2].forEach(function (teamNum) {
       var key = 't' + teamNum;  // 't1' or 't2' in scenario data
