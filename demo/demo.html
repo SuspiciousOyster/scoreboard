@@ -13,6 +13,27 @@
 
     <!-- Load the CANONICAL view styles from html/custom/view/ (via symlink) -->
     <link rel="stylesheet" href="announcer-jammers.css">
+
+    <!-- Deploy info badge (written by CI) -->
+    <script>
+    (function() {
+      var x = new XMLHttpRequest();
+      x.open('GET', 'deploy-info.json', true);
+      x.onload = function() {
+        if (x.status === 200) {
+          try {
+            var info = JSON.parse(x.responseText);
+            var b = document.createElement('div');
+            b.id = 'deploy-badge';
+            b.style.cssText = 'position:fixed;bottom:4px;right:4px;z-index:99999;font-size:9px;padding:2px 6px;background:rgba(0,0,0,.6);color:rgba(255,255,255,.4);border-radius:4px;font-family:monospace;pointer-events:none;';
+            b.textContent = info.branch;
+            document.body.appendChild(b);
+          } catch(e) {}
+        }
+      };
+      x.send();
+    })();
+    </script>
   </head>
   <body class="preload">
     <div class="announcer-jammers">

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev
+      - 'feature/*'
     paths:
       - 'demo/**'
       - 'html/custom/view/announcer-jammers*'
@@ -11,6 +12,11 @@ on:
 
   # Allow manual trigger from Actions tab
   workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'Branch to deploy (default: current branch)'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -37,6 +43,11 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
+
+      # Write deploy info so the live site shows which branch is deployed
+      - name: Stamp deploy info
+        run: |
+          echo '{"branch":"${{ github.ref_name }}","sha":"${{ github.sha }}","deployedAt":"${{ github.event.repository.updated_at }}"}' > demo/deploy-info.json
 
       - name: Upload artifact (demo/ directory)
         uses: actions/upload-pages-artifact@v3
