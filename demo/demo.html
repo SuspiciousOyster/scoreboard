@@ -60,6 +60,36 @@
         </div>
       </section>
 
+      <!-- ═══════════════════════════════════════════
+           Score Timeline
+           ═══════════════════════════════════════════ -->
+      <div id="score-timeline" class="score-timeline">
+        <div style="padding:24px; text-align:center; color:var(--text-secondary); font-style:italic;">
+          Timeline will appear once the game starts…
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════
+           Penalty Snapshots
+           ═══════════════════════════════════════════ -->
+      <section class="team-section">
+        <div class="team-header" id="team-header-1-pen">
+          <span class="team-name">Thunderbirds</span>
+        </div>
+        <div id="penalties-1" class="team-penalties">
+          <div class="pen-empty">Penalties will appear once the game starts…</div>
+        </div>
+      </section>
+
+      <section class="team-section">
+        <div class="team-header" id="team-header-2-pen">
+          <span class="team-name">Valkyries</span>
+        </div>
+        <div id="penalties-2" class="team-penalties">
+          <div class="pen-empty">Penalties will appear once the game starts…</div>
+        </div>
+      </section>
+
     </div>
 
     <!-- Demo Controls -->
@@ -121,6 +151,12 @@
               '<div class="empty-message">Click "Start Demo Game" to begin…</div>';
             document.getElementById('jammer-table-2').innerHTML =
               '<div class="empty-message">Click "Start Demo Game" to begin…</div>';
+            document.getElementById('score-timeline').innerHTML =
+              '<div style="padding:24px; text-align:center; color:var(--text-secondary); font-style:italic;">Timeline will appear once the game starts…</div>';
+            document.getElementById('penalties-1').innerHTML =
+              '<div class="pen-empty">Penalties will appear once the game starts…</div>';
+            document.getElementById('penalties-2').innerHTML =
+              '<div class="pen-empty">Penalties will appear once the game starts…</div>';
           }
           btnStart.textContent = '▶ Start Demo Game';
           btnStart.disabled = false;

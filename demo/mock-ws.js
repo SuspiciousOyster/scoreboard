@@ -175,7 +175,7 @@
     s[PREFIX + '.Team(1).JamScore'] = '0';
     s[PREFIX + '.Team(1).Timeouts'] = '3';
     s[PREFIX + '.Team(1).OfficialReviews'] = '2';
-    s[PREFIX + '.Team(1).TotalPenalties'] = '0';
+    s[PREFIX + '.Team(1).TotalPenalties'] = '6';
     s[PREFIX + '.Team(1).Color(overlay.bg)'] = '#1f6feb';
     s[PREFIX + '.Team(1).Color(overlay.fg)'] = '#ffffff';
 
@@ -186,7 +186,7 @@
     s[PREFIX + '.Team(2).JamScore'] = '0';
     s[PREFIX + '.Team(2).Timeouts'] = '3';
     s[PREFIX + '.Team(2).OfficialReviews'] = '2';
-    s[PREFIX + '.Team(2).TotalPenalties'] = '0';
+    s[PREFIX + '.Team(2).TotalPenalties'] = '4';
     s[PREFIX + '.Team(2).Color(overlay.bg)'] = '#da3633';
     s[PREFIX + '.Team(2).Color(overlay.fg)'] = '#ffffff';
 
@@ -194,11 +194,38 @@
     TEAM1_SKATERS.forEach(function (sk, i) {
       s[PREFIX + '.Team(1).Skater(' + i + ').Name'] = sk.name;
       s[PREFIX + '.Team(1).Skater(' + i + ').RosterNumber'] = sk.number;
+      // Add some penalties per skater
+      var penCodes = [
+        ['IllegalProcedure'],
+        ['BackBlock', 'Cutting'],
+        ['HighBlock']
+      ];
+      if (penCodes[i]) {
+        s[PREFIX + '.Team(1).Skater(' + i + ').PenaltyCount'] = String(penCodes[i].length);
+        penCodes[i].forEach(function (code, pi) {
+          s[PREFIX + '.Team(1).Skater(' + i + ').Penalty(' + pi + ').Code'] = code;
+        });
+      }
     });
+    // Update total team penalties
+    var t1Pens = 0, t2Pens = 0;
     TEAM2_SKATERS.forEach(function (sk, i) {
       var idx = i + TEAM1_SKATERS.length; // 3, 4, 5
       s[PREFIX + '.Team(2).Skater(' + idx + ').Name'] = sk.name;
       s[PREFIX + '.Team(2).Skater(' + idx + ').RosterNumber'] = sk.number;
+      // Add some penalties per skater
+      var penCodes = [
+        ['LowBlock', 'Interference'],
+        ['DirectionOfPlay'],
+        ['IllegalContact']
+      ];
+      if (penCodes[i]) {
+        s[PREFIX + '.Team(2).Skater(' + idx + ').PenaltyCount'] = String(penCodes[i].length);
+        t2Pens += penCodes[i].length;
+        penCodes[i].forEach(function (code, pi) {
+          s[PREFIX + '.Team(2).Skater(' + idx + ').Penalty(' + pi + ').Code'] = code;
+        });
+      }
     });
 
     // Initial clock state — pre-game
@@ -435,8 +462,8 @@
     _running = false;
     _currentStep = -1;
     resetState();
-    if (typeof fullRender === 'function') {
-      try { fullRender(); } catch (e) { /* swallow */ }
+    if (typeof window._announcerJammersRender === 'function') {
+      try { window._announcerJammersRender(); } catch (e) { /* swallow */ }
     }
   }
 
