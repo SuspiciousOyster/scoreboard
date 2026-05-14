@@ -31,8 +31,9 @@ jobs:
       # Copy canonical view files into demo/ (resolves symlinks for static Pages deploy)
       - name: Resolve canonical view files
         run: |
-          cp -L html/custom/view/announcer-jammers-render.js demo/announcer-jammers-render.js
-          cp -L html/custom/view/announcer-jammers.css demo/announcer-jammers.css
+          rm -f demo/announcer-jammers-render.js demo/announcer-jammers.css
+          cp html/custom/view/announcer-jammers-render.js demo/announcer-jammers-render.js
+          cp html/custom/view/announcer-jammers.css demo/announcer-jammers.css
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
