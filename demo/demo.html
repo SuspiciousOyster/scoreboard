@@ -16,6 +16,31 @@
     <script src="announcer-jammers-render.js"></script>
 
     <link rel="stylesheet" href="announcer-jammers.css">
+
+    <!-- Debug overlay for troubleshooting -->
+    <script src="debug-overlay.js"></script>
+
+    <!-- Debug logging for timeline rendering -->
+    <script>
+    (function() {
+      var origRender = window._announcerJammersRender;
+      if (origRender) {
+        window._announcerJammersRender = function() {
+          console.log('[demo] fullRender called');
+          try {
+            origRender();
+            var tl = document.getElementById('score-timeline');
+            if (tl) {
+              var hasContent = tl.innerHTML.indexOf('tl-container') !== -1;
+              console.log('[demo] timeline rendered:', hasContent ? 'YES - has bars' : 'NO - empty/placeholder');
+            }
+          } catch(e) {
+            console.error('[demo] render error:', e.message, e.stack);
+          }
+        };
+      }
+    })();
+    </script>
   </head>
   <body class="preload">
     <div class="announcer-jammers">
