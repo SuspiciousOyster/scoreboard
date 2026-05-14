@@ -269,6 +269,15 @@
         WS.Set(base + '.Fielding(Pivot).SkaterNumber', globalSkaters[spGlobalIdx].number);
         WS.Set(base + '.Fielding(Pivot).Position', 'Jammer');
       }
+
+      // Box trips (for power jam ⚡ detection)
+      // When a team scores 0, their jammer likely served box time
+      if (jamScore === 0 && !td.lead) {
+        for (var bt = 0; bt < 1; bt++) {
+          WS.Set(PREFIX + '.Team(' + teamNum + ').BoxTrip(' + bt + ').PenaltyTime', '120000');
+          WS.Set(PREFIX + '.Team(' + teamNum + ').BoxTrip(' + bt + ').Serving', 'true');
+        }
+      }
     });
 
     // Force the render to run with the new state.

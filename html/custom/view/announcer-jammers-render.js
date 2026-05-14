@@ -485,7 +485,20 @@
       return '<div class="gs-stat"><span class="gs-label">' + label + '</span>' + b + '</div>';
     }
 
+    // ── Score Differential ──
+    var diff = ts1.totalScore - ts2.totalScore;
+    var diffHtml = '<div class="diff-stat">' +
+      '<span class="diff-arrow diff-arrow-t1' + (diff > 0 ? ' is-leading' : '') + '">◀</span>' +
+      '<span class="diff-value">' + (diff === 0 ? '—' : Math.abs(diff)) + '</span>' +
+      '<span class="diff-arrow diff-arrow-t2' + (diff < 0 ? ' is-leading' : '') + '">▶</span>' +
+      '</div>';
+
+    // ── State Badge ──
+    var stateHtml = renderStateBadge();
+
     el.innerHTML =
+      diffHtml +
+      stateHtml +
       '<div class="gs-row">' +
         stat('Lead %', leadPct1 + '%', leadPct2 + '%') +
         stat('Score', ts1.totalScore, ts2.totalScore, true) +
@@ -498,6 +511,45 @@
         stat('No Init', ts1.noInitialCount, ts2.noInitialCount) +
         stat('Rat', ratio) +
         stat('<span class="gs-tip" title="Points scored while opponent had lead and had not lost it. Shows poor lead-jammer awareness.">Opp Sc</span>', ts2.scoredVsLead, ts1.scoredVsLead) +
+      '</div>';
+  }
+
+  /**
+   * Render the current game state badge.
+   * Reads CRG state fields directly — no interpretation.
+   */
+  function renderStateBadge() {
+    var inJam = isTrue(getPath('InJam'));
+    var inTimeout = isTrue(getPath('InTimeout'));
+    var inLineup = isTrue(getPath('InLineup')) || isTrue(getPath('Clock(Lineup).Running'));
+    var officialReview = isTrue(getPath('OfficialReview'));
+
+    var label, cls, symbol;
+
+    if (inJam || isTrue(getPath('StopJam'))) {
+      label = 'In Jam';
+      cls = 'state-badge-injam';
+      symbol = '⏱';
+    } else if (officialReview) {
+      label = 'Official Review';
+      cls = 'state-badge-timeout';
+      symbol = '🔍';
+    } else if (inTimeout) {
+      label = 'Timeout';
+      cls = 'state-badge-timeout';
+      symbol = '⏸';
+    } else if (inLineup) {
+      label = 'Lineup';
+      cls = 'state-badge-lineup';
+      symbol = '⏳';
+    } else {
+      label = '—';
+      cls = 'state-badge-innocent';
+      symbol = '⚪';
+    }
+
+    return '<div style="display:flex;align-items:center;justify-content:center;gap:12px;padding-bottom:10px;">' +
+      '<span class="state-badge ' + cls + '"><span class="state-badge-symbol">' + symbol + '</span> ' + label + '</span>' +
       '</div>';
   }
 
@@ -584,6 +636,66 @@
     var headerEl = document.getElementById('team-header-' + teamNum);
     if (headerEl) {
       headerEl.classList.add('t' + teamNum + '-header');
+    }
+
+    // ── Star Pass ★ Indicator ──
+    // Color reflects the team's current star-pass / lead state:
+    //   star-lead = team had lead this jam
+    //   star-sp    = star pass was completed
+    //   star-nil   = no special state
+    var starEl = document.getElementById('star-' + teamNum);
+    if (starEl) {
+      // Scan recent TeamJam data for this team's StarPass and Lead status
+      var hasSP = false;
+      var hasLead = false;
+      var teamJams = collectTeamJams();
+      // Look at the most recent jam for this team
+      for (var i = teamJams.length - 1; i >= 0; i--) {
+        var jam = teamJams[i];
+        var tj = jam && jam.teams && jam.teams[String(teamNum)];
+        if (tj) {
+          if (isTrue(tj.StarPass)) hasSP = true;
+          if (isTrue(tj.Lead)) hasLead = true;
+          break; // Only need the most recent jam
+        }
+      }
+
+      starEl.className = 'team-star';
+      if (hasSP) {
+        starEl.classList.add('star-sp');
+      } else if (hasLead) {
+        starEl.classList.add('star-lead');
+      } else {
+        starEl.classList.add('star-nil');
+      }
+    }
+
+    // ── Power Jam ⚡ Indicator ──
+    // Shows when the OPPONENT's jammer is/was in the penalty box.
+    // We check by looking at the current team's BoxTrip data — if this
+    // team's jammer has an active box trip, the OTHER team gets the bolt.
+    var pjEl = document.getElementById('power-jam-' + teamNum);
+    if (pjEl) {
+      // Determine opponent team number
+      var oppTeam = teamNum === 1 ? 2 : 1;
+      // Check if opponent jammer has active box trips
+      var inPowerJam = false;
+      var reBox = new RegExp(
+        '^' + PREFIX.replace(/\./g, '\\.') +
+        '\\.Team\\(' + oppTeam + '\\)\\.BoxTrip\\((\\d+)\\)\\.(PenaltyTime|Serving)$'
+      );
+      Object.keys(WS.state).forEach(function (key) {
+        var m = key.match(reBox);
+        if (!m) return;
+        var field = m[2];
+        var val = WS.state[key];
+        if (field === 'PenaltyTime' && asNum(val) > 0) {
+          inPowerJam = true;
+        } else if (field === 'Serving' && isTrue(val)) {
+          inPowerJam = true;
+        }
+      });
+      pjEl.className = 'team-power-jam' + (inPowerJam ? '' : ' hidden');
     }
   }
 
@@ -805,6 +917,18 @@
     PREFIX + '.Team(*).TotalPenalties',
     PREFIX + '.Team(*).Skater(*).PenaltyCount',
     PREFIX + '.Team(*).Skater(*).Penalty(*).Code'
+  ], queueRender);
+
+  // State paths — clock, jam state, box trips (for power jam, state badge)
+  WS.Register([
+    PREFIX + '.InJam',
+    PREFIX + '.StopJam',
+    PREFIX + '.InTimeout',
+    PREFIX + '.InLineup',
+    PREFIX + '.OfficialReview',
+    PREFIX + '.Clock(Lineup).Running',
+    PREFIX + '.Team(*).BoxTrip(*).PenaltyTime',
+    PREFIX + '.Team(*).BoxTrip(*).Serving'
   ], queueRender);
 
   /* ── Initial Render ── */
